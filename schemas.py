@@ -1,6 +1,6 @@
 """ tutorial using psycopg2 """
 
-from connectdb import yellowpgdb
+from yellowpgdb import yellowpgdb
 from pprint import pprint
 
 

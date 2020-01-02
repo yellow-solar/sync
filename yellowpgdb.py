@@ -31,14 +31,12 @@ class yellowpgdb:
                                 database=self.cfg['db'],
                                 user=self.cfg['user'],
                                 password=self.cfg['password'])
-            # print current version connection
-            print('PostgreSQL database version:')
             # get version
             cur = conn.cursor()
             cur.execute('SELECT version()')
             # display the PostgreSQL database server version
             db_version = cur.fetchone()
-            print(db_version)
+            print('PostgreSQL database version: ' + ", ".join(db_version))
             # close the communication with the PostgreSQL
             cur.close()
             return(conn)

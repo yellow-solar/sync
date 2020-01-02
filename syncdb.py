@@ -1,49 +1,47 @@
 """ Program to get snapshot, upload to PostgresDB, and then rug SQL functions to update core tables  """
 
-# System
-from io import StringIO
-
 # Third party libraries
 import pandas as pd
+from datetime import datetime
 
 # Connection modules
 from APIconn import APIconn
 from yellowpgdb import yellowpgdb
+from mapping import headerMap
+
+print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 TABLE = 'accounts'
 PROVIDER = 'angaza'
+ORG = 'yellow'
+source_mapping = headerMap('accounts', 'angaza',sys=True)
+update_on = source_mapping.loc[source_mapping['update_on']==1,ORG].iloc[0]
 
-# provider connection and snapshots
-apiconn = APIconn(PROVIDER)
-snapshot = apiconn.pullSnapshot(TABLE)
-# print(snapshot)
+def createSelect(row):
+    dtype = row['type']
+    col = row[ORG]
+    select = f"a.{col}"
+    if (dtype not in ('TEXT','GEOGRAPHY')):  
+        select = f"cast(a.{col} as {dtype}) as {col}"
+    elif (dtype == 'GEOGRAPHY'):
+        select = f"ST_GeographyFromText('POINT('||{col}||')') as {col}"
+    return(select)
 
-# process file
-lines = StringIO(snapshot)
-df = pd.read_csv(lines, dtype = str, 
-                na_values=['None','none','NONE'])
+# execute the insert casts
+source_mapping['select'] = source_mapping.apply(createSelect, axis = 1)
+casts = ', '.join(source_mapping['select'].values.tolist())
+# generate a select statement
+select = f"select {casts} from {PROVIDER}.{TABLE} a"
+cols_csv = ", ".join(source_mapping[ORG].values.tolist())
+insert = f"insert into core.{TABLE} ({cols_csv})"
+where = f"where a.{update_on} not in (select c.{update_on} from core.{TABLE})"
+insert_not_update = "\n".join([insert, select, where, " limit 5;"])
 
-
-# yellowdb connections
+# Yellowdb connections
 db = yellowpgdb()
-db_engine = db.get_engine(echo=True)
+db_conn = db.connect()
+cursor = db_conn.cursor()
 
-# Re-create table header in case different
-df.head(0).to_sql(
-    TABLE, db_engine,schema = PROVIDER, if_exists='replace',index=False)
-
-# Create stringIO
-lines = StringIO()
-df.to_csv(lines, sep='\t', header=False, index=False)
-lines.seek(0)
-
-# Upload contents
-db_conn = db_engine.raw_connection()
-cur = db_conn.cursor()
-cur.copy_from(lines, f"{PROVIDER}.{TABLE}") 
-db_conn.commit()
-
-# conn = APIconn('upya')
-# snapshot = conn.pullSnapshot('users')
-# print(len(snapshot))
-# print(snapshot)
+# execute the update
+# cursor.execute(insert_all)
+print(insert_not_update)
