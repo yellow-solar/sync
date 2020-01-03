@@ -31,18 +31,25 @@ class yellowpgdb:
                                 database=self.cfg['db'],
                                 user=self.cfg['user'],
                                 password=self.cfg['password'])
-            # get version
-            cur = conn.cursor()
-            cur.execute('SELECT version()')
-            # display the PostgreSQL database server version
-            db_version = cur.fetchone()
-            print('PostgreSQL database version: ' + ", ".join(db_version))
-            # close the communication with the PostgreSQL
-            cur.close()
             return(conn)
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)       
             
+    def get_version(self):
+        conn = psycopg2.connect(host=self.cfg['host'],
+                                port=self.cfg['port'],
+                                database=self.cfg['db'],
+                                user=self.cfg['user'],
+                                password=self.cfg['password'])
+        # get version
+        cur = conn.cursor()
+        cur.execute('SELECT version()')
+        # display the PostgreSQL database server version
+        db_version = cur.fetchone()
+        print('PostgreSQL database version: ' + ", ".join(db_version))
+        # close the communication with the PostgreSQL
+        cur.close()        
+    
 if __name__ == "__main__":
     pgdb = yellowpgdb()
     conn = pgdb.connect()

@@ -1,0 +1,16 @@
+{
+    "providers":{
+        "angaza":{
+            "tables":{
+                "accounts":"accounts",
+                "users":"users"
+            }
+        },
+        "upya":{
+            "tables":{
+                "accounts":"contracts",
+                "users":"users"
+            }
+        }
+    }
+}
