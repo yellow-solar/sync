@@ -39,7 +39,8 @@ class TableInterface:
         self.pk = (self.core_map
                     .loc[self.core_map['pk']==1,self.org].iloc[0])
         self.db = yellowpgdb()
-        self.
+        self.core_cfg = config('sync.json', 'core').get(self.table, None)
+        self.update_sql = self.core_cfg.get('update_query',None)
 
     def fetchAndUploadProviderData(self):
         """  Function to sync a specifc table from specific provider 
@@ -186,8 +187,10 @@ class TableInterface:
 
     def _castTZasTS(self, mapping):
         def applyCast(row):
-            s = (row[self.org] if (row['type'] != 'TIMESTAMPTZ') 
-                else f"cast ({row[self.org]} as TIMESTAMP) {row[self.org]}")
+            if (row['type'] != 'TIMESTAMPTZ'):
+                s = f"a.{row[self.org]}"
+            else: 
+                s = f"cast (a.{row[self.org]} as TIMESTAMP) {row[self.org]}"
             return(s)    
         return(mapping.apply(applyCast, axis = 1))
 
@@ -196,20 +199,19 @@ class TableInterface:
 
         # if update or insert, need to set the where clause
         is_or_not = "is not" if update else "is"
-        is_or_not = "is not" if update else "is"
-
         #list of columns from mapping
         cols = ", ".join(self._castTZasTS(self.zoho_map))
         # sql command
-        sql = f"""
+        if self.update_sql is None:  
+            sql = f"""
                 set timezone TO 'Africa/Johannesburg';
                 select {cols}
                 from {self.core}.{self.table} a
                 where a.zoho_id {is_or_not} null
                 order by {self.pk}
             """
-        # fetch df
-        # df = pd.read_sql(sql, self.db_conn)
+        else:   
+            sql = self.update_sql['sql'].format(cols)
         return(sql)
 
     def connect(self):
@@ -227,7 +229,8 @@ class TableInterface:
 
 
 if __name__ == "__main__":
-    sync = TableInterface('angaza','clients')
+    sync = TableInterface('angaza','payments')
+    print(sync.fetchCoreTableSQL(update=True))
     # sync.fetchAndUploadProviderData()
     # sync.internalSync()
     # x = pd.DataFrame(sync.selectData())

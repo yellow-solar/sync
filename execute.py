@@ -20,27 +20,31 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     
     # set update criteria if required
     update_on = tablesync.update_on if update else None
+    insert_or_update = "Updated" if update else "Inserted"
 
-    # fetch DF
+    # Fetch DF
     sql = tablesync.fetchCoreTableSQL(update=update)
     cur = tablesync.db_conn.cursor()
     cur.execute(sql)
-    # process results
+    # Process results
     records = cur.fetchall()
     colnames = [desc[0] for desc in cur.description]
-
-    # list of dicts which are zipped with field name
+    # List of dicts which are zipped with field name
     record_dicts = [dict(zip(colnames, record)) for record in records]
     
-    # upload/insert df
+    # Split data into slices for XML length restriction 
     dicts_slices = ([record_dicts[i:i + slice_length] 
                     for i in range(0, len(record_dicts), slice_length)])
-    for dicts_slice in dicts_slices:
-        # call zoho with XML
+    processed = 0
+    # Upload/insert data slice
+    for j in range (0,len(dicts_slices)):
+        dicts_slice = dicts_slices[j]
+        # Call zoho with XML
         response = zoho.rpcUploadChunk(dicts_slice, form, update_on = update_on)
-        insert_or_update = "Updated" if update else "Inserted"
-        print(f"{insert_or_update} {len(dicts_slice)} records to Zoho")
+        processed += len(dicts_slice)
+        print(f"Slice {j+1}: {insert_or_update} {processed} of {len(record_dicts)} records to Zoho")
 
+        # Insert IDs back to DB if not updating
         if not update:
             try:
                 # process response to get ids
@@ -49,7 +53,8 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 # update DB with each ZOho ID 
                 print("Inserting IDs...")
                 
-                #TODO: build a progress tracker
+                # loop through ids and update YDB one at a time
+                counter = 0
                 for row in ids[['ID',tablesync.update_on]].itertuples(index=False, name=None):
                     cur = tablesync.db_conn.cursor()
                     update_sql = f""" update {tablesync.core}.{tablesync.table}
@@ -57,16 +62,17 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                         where {tablesync.update_on} = %s
                     """
                     cur.execute(update_sql, row)
+                    counter+=1
+                    print(f"Inserted {counter} of {len(ids)}")
                 tablesync.db_conn.commit()
                 print(f"Inserted {len(ids)} IDs to YDB")
             except:
                 ### if it excepts then we need to delete the new inserts and IDs?
                 raise Exception("Failed to process response")
 
-
 if __name__ == "__main__":
     """
-    when Cron calls the zoho script, it must call with the form 
+    when cron calls the zoho script, it must call with the form 
     name input 
     """
 
@@ -86,22 +92,21 @@ if __name__ == "__main__":
 
     # YDB table config
     tablesync = TableInterface(PROVIDER,table)
-    
-    # 1. Update Providers > DB
-    # tablesync.fetchAndUploadProviderData()
-    # tablesync.internalSync()
-
-    # 2. Update Zoho <> YDB
     tablesync.connect()
 
+    # 1. Update Providers > DB
+    tablesync.fetchAndUploadProviderData()
+    tablesync.internalSync()
+
+    # 2. Update Zoho <> YDB
     # Fetch zoho cfg and setup API connection
     zoho_cfg = config(filename='config.json', section='zoho')
     zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
-
-    # update the old records to Zoho - update first because inserts don't need to be
+    
+    # Update the old records to Zoho - update first because inserts don't need to be
     insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
 
-    # insert the new records to Zoho
+    # Insert the new records to Zoho
     insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=False, slice_length = slice_length)
 
     

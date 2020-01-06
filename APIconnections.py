@@ -179,7 +179,6 @@ class ZohoAPI:
         return("".join(data_xml))
 
     def rpcUploadChunk(self, data, form, update_on = None):
-        print(f"Number of records slice: {len(data)}")
         # if data is list, use the function to create xml from list of dicts
         if type(data) is list:
             createXml = self.createXmlFromDicts
