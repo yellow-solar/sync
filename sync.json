@@ -1,16 +1,78 @@
+
 {
     "providers":{
         "angaza":{
             "tables":{
                 "accounts":"accounts",
-                "users":"users"
+                "users":"users",
+                "payments":"payments",
+                "replacements":"replacements",
+                "stock":"stock_unit_statuses",
+                "applications":"prospects",
+                "clients":"clients"
             }
         },
         "upya":{
             "tables":{
                 "accounts":"contracts",
-                "users":"users"
+                "users":"",
+                "payments":"",
+                "replacements":"",
+                "stock":"",
+                "applications":"",
+                "clients":""
             }
+        }
+    },
+    "zoho":{
+        "users":{
+            "table":"users",
+            "form":"",
+            "slice_length":500
+        },
+        "accounts":{
+            "table":"accounts",
+            "form":"Accounts_Data_Import_V2",
+            "slice_length":500
+        },
+        "payments":{
+            "table":"payments",
+            "form":"Payments_Data_Import",
+            "slice_length":1200,
+            "update_query":{
+                "sql":"select * from core.payments a where (a.effective_utc > NOW() - INTERVAL '10 DAYS' or(a.reversal_external_id is not null and a.effective_utc > NOW() - INTERVAL '60 DAYS')) and a.zoho_id is not null"
+            }
+        },
+        "credit_details":{
+            "table":"applications",
+            "form":"Applications_Credit_Details",
+            "slice_length":350,
+            "update_query":{
+                "sql":"select a.* from core.applications a join core.accounts b on a.account_external_id = b.account_external_id where a.submitted_utc > NOW() - INTERVAL '15 DAYS'  or (b.account_external_id is not null and b.registration_date_utc > NOW() - INTERVAL '15 DAYS') and a.zoho_id is not null"
+            }
+        },
+        "personal_details":{
+            "table":"applications",
+            "form":"Applications_Personal_Details",
+            "slice_length":350,
+            "update_query":{
+                "sql":"select a.* from core.applications a join core.accounts b on a.account_external_id = b.account_external_id where a.submitted_utc > NOW() - INTERVAL '15 DAYS'  or (b.account_external_id is not null and b.registration_date_utc > NOW() - INTERVAL '15 DAYS') and a.zoho_id is not null"
+            }
+        },
+        "stock":{
+            "table":"stock",
+            "form":"Stock_Data_Import",
+            "slice_length":1000
+        },
+        "replacements":{
+            "table":"replacements",
+            "form":"Replaced_Units_Report",
+            "slice_length":1000
+        },
+        "clients":{
+            "table":"clients",
+            "form":"",
+            "slice_length":1000
         }
     }
 }

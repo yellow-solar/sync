@@ -3,7 +3,6 @@
 from yellowpgdb import yellowpgdb
 from pprint import pprint
 
-
 def create_schemas():
     commands = [
         "CREATE SCHEMA IF NOT EXISTS core;",
