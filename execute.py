@@ -70,43 +70,50 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 ### if it excepts then we need to delete the new inserts and IDs?
                 raise Exception("Failed to process response")
 
+def zohoSync(zoho_table, provider, zoho):
+    # 0. Prep
+    # zoho syc config
+    zohosync_cfg = config(filename='sync.json', section='zoho')[zoho_table]
+    table = zohosync_cfg['table']
+    form = zohosync_cfg['form']
+    slice_length = zohosync_cfg['slice_length']
+    update_ydb = zohosync_cfg.get('update_ydb',True)
+
+    # YDB table config
+    tablesync = TableInterface(PROVIDER,table)
+    tablesync.connect()
+
+    if update_ydb:
+        # 1. Update Providers > DB
+        tablesync.syncdbtable()
+
+    # 2. Update Zoho <> YDB
+    # Update the old records to Zoho - update first because inserts don't need to be
+    insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
+
+    # Insert the new records to Zoho
+    insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=False, slice_length = slice_length)
+
 if __name__ == "__main__":
     """
     when cron calls the zoho script, it must call with the form 
     name input 
     """
 
+    # Set provider
     PROVIDER = 'angaza'
-    
+
+    # Fetch zoho cfg and setup API connection object
+    zoho_cfg = config(filename='config.json', section='zoho')
+    zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
+
     # assign form from sys.args (1st is the )
     if len(sys.argv) > 1:
         table = sys.argv[1]
     else:
         # raise Exception("Expecting form as argument to call upload")
-        table = 'accounts'
+        zoho_table = 'credit_details'
 
-    # zoho syc config
-    zohosync_cfg = config(filename='sync.json', section='zoho')[table]
-    form = zohosync_cfg['form']
-    slice_length = zohosync_cfg['slice_length']
-
-    # YDB table config
-    tablesync = TableInterface(PROVIDER,table)
-    tablesync.connect()
-
-    # 1. Update Providers > DB
-    tablesync.fetchAndUploadProviderData()
-    tablesync.internalSync()
-
-    # 2. Update Zoho <> YDB
-    # Fetch zoho cfg and setup API connection
-    zoho_cfg = config(filename='config.json', section='zoho')
-    zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
-    
-    # Update the old records to Zoho - update first because inserts don't need to be
-    insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
-
-    # Insert the new records to Zoho
-    insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=False, slice_length = slice_length)
+    zohoSync(zoho_table, PROVIDER, zoho)
 
     

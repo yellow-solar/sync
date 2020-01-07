@@ -196,21 +196,19 @@ class TableInterface:
 
     def fetchCoreTableSQL(self, update=False):
         """ get a core table with our without zohoid for insert or update"""
-
         # if update or insert, need to set the where clause
         is_or_not = "is not" if update else "is"
         #list of columns from mapping
         cols = ", ".join(self._castTZasTS(self.zoho_map))
         # sql command
-        if self.update_sql is None:  
-            sql = f"""
+        sql = f"""
                 set timezone TO 'Africa/Johannesburg';
                 select {cols}
                 from {self.core}.{self.table} a
                 where a.zoho_id {is_or_not} null
                 order by {self.pk}
             """
-        else:   
+        if update and self.update_sql is not None:  
             sql = self.update_sql['sql'].format(cols)
         return(sql)
 
@@ -226,6 +224,10 @@ class TableInterface:
 
     def close(self):
         self.db_conn.close()
+
+    def syncdbtable(self):
+        self.fetchAndUploadProviderData()
+        self.internalSync()
 
 
 if __name__ == "__main__":
