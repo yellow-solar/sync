@@ -80,7 +80,7 @@ def zohoSync(zoho_table, provider, zoho):
     update_ydb = zohosync_cfg.get('update_ydb',True)
 
     # YDB table config
-    tablesync = TableInterface(PROVIDER,table)
+    tablesync = TableInterface(provider,table)
     tablesync.connect()
 
     if update_ydb:
@@ -99,21 +99,28 @@ if __name__ == "__main__":
     when cron calls the zoho script, it must call with the form 
     name input 
     """
+    providers = config(filename='sync.json', section='providers')
+    zoho_tables = config(filename='sync.json', section='zoho')  
 
-    # Set provider
-    PROVIDER = 'angaza'
+    # Loop through all providers
+    provider = 'angaza'
+    # for provider in providers:  
+    
 
     # Fetch zoho cfg and setup API connection object
     zoho_cfg = config(filename='config.json', section='zoho')
     zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
     # assign form from sys.args (1st is the )
-    if len(sys.argv) > 1:
-        table = sys.argv[1]
-    else:
-        # raise Exception("Expecting form as argument to call upload")
-        zoho_table = 'credit_details'
+    # if len(sys.argv) > 1:
+    #     zoho_table = sys.argv[1]
+    # else:
+    #     # raise Exception("Expecting form as argument to call upload")
+    #     zoho_table = 'accounts'
 
-    zohoSync(zoho_table, PROVIDER, zoho)
+    # loop through each table in zoho
+    for zoho_table in zoho_tables:
+        print(zoho_table)
+        zohoSync(zoho_table, provider, zoho)
 
     

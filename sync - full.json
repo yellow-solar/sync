@@ -48,10 +48,35 @@
             "form":"Users_Data_Import",
             "slice_length":500
         },
+        "accounts":{
+            "table":"accounts",
+            "form":"Accounts_Data_Import_V2",
+            "slice_length":500
+        },
+        "payments":{
+            "table":"payments",
+            "form":"Payments_Data_Import",
+            "slice_length":1200
+        },
         "applications":{
             "table":"applications",
             "form":"Applications_Data_Import",
             "slice_length":500
+        },
+        "stock":{
+            "table":"stock",
+            "form":"Stock_Data_Import",
+            "slice_length":1000
+        },
+        "replacements":{
+            "table":"replacements",
+            "form":"Replaced_Units_Report",
+            "slice_length":1000
+        },
+        "clients":{
+            "table":"clients",
+            "form":"",
+            "slice_length":1000
         }
     }
 }
