@@ -70,14 +70,14 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 ### if it excepts then we need to delete the new inserts and IDs?
                 raise Exception("Failed to process response")
 
-def zohoSync(zoho_table, provider, zoho):
+def zohoSync(zoho_table, provider, zoho, dbupdate = False):
     # 0. Prep
     # zoho syc config
     zohosync_cfg = config(filename='sync.json', section='zoho')[zoho_table]
     table = zohosync_cfg['table']
     form = zohosync_cfg['form']
     slice_length = zohosync_cfg['slice_length']
-    update_ydb = zohosync_cfg.get('update_ydb',True)
+    update_ydb = zohosync_cfg.get('update_ydb',dbupdate)
 
     # YDB table config
     tablesync = TableInterface(provider,table)
@@ -121,6 +121,6 @@ if __name__ == "__main__":
     # loop through each table in zoho
     for zoho_table in zoho_tables:
         print(zoho_table)
-        zohoSync(zoho_table, provider, zoho)
+        zohoSync(zoho_table, provider, zoho, dbupdate=False)
 
     
