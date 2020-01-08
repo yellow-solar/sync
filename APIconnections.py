@@ -221,15 +221,13 @@ class ZohoAPI:
                         print("Failed with status: " + status.text)
                         raise Exception("An entry was not successful in rpc response from Zoho")
             else:
-                print(rpc_request.text)
+                # print(rpc_request.text)
                 raise Exception("Received errorlist in rpc response from Zoho")
 
         else:
-            print("Error: " + 
-                    str(rpc_request.status_code) + 
-                    " - see rpc request text for more detail")
             print(rpc_request.text)
-            raise ValueError("Request failed with error code " + rpc_request.status_code)
+            print(f"Error {rpc_request.status_code}: see rpc request text for more detail")
+            raise ValueError(f"Request failed with error code {rpc_request.status_code}")
         
         # If all is good, then process the IDs for return
         return(rpc_request.text)

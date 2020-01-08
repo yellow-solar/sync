@@ -46,7 +46,7 @@
         "applications":{
             "table":"applications",
             "form":"Applications_Data_Import",
-            "slice_length":500
+            "slice_length":350
         }
     }
 }
