@@ -43,6 +43,11 @@
         "clients":{}
     },
     "zoho":{
+        "users":{
+            "table":"users",
+            "form":"Users_Data_Import",
+            "slice_length":500
+        },
         "applications":{
             "table":"applications",
             "form":"Applications_Data_Import",
