@@ -37,7 +37,7 @@
         "stock":{},
         "applications":{
             "update_query":{
-                "sql":"select {} from core.applications a join core.accounts b on a.account_external_id = b.account_external_id where (a.submitted_utc > NOW() - INTERVAL '15 DAYS'  or (b.account_external_id is not null and b.registration_date_utc > NOW() - INTERVAL '15 DAYS')) and a.zoho_id is not null"
+                "sql":"select {} from core.applications a left join core.accounts b on a.account_external_id = b.account_external_id where (a.submitted_utc > NOW() - INTERVAL '15 DAYS'  or (b.account_external_id is not null and b.registration_date_utc > NOW() - INTERVAL '15 DAYS')) and a.zoho_id is not null"
             }
         },
         "clients":{}

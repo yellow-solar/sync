@@ -120,6 +120,7 @@ if __name__ == "__main__":
 
     # loop through each table in zoho
     for zoho_table in zoho_tables:
+    # for zoho_table in ['applications']:
         print(zoho_table)
         zohoSync(zoho_table, provider, zoho, dbupdate=True)
 
