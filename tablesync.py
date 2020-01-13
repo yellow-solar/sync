@@ -202,7 +202,6 @@ class TableInterface:
         cols = ", ".join(self._castTZasTS(self.zoho_map))
         # sql command
         sql = f"""
-                set timezone TO 'Africa/Johannesburg';
                 select {cols}
                 from {self.core}.{self.table} a
                 where a.zoho_id {is_or_not} null
