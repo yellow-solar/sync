@@ -27,5 +27,6 @@ core_tables = config(filename='sync.json', section='core')
 
 provider = 'angaza'
 for table in providers[provider].get('tables',[]).keys():
-        tablesync = TableInterface(provider,table)
-        tablesync.syncdbtable()
+# for table in ['applications']:
+    tablesync = TableInterface(provider,table)
+	tablesync.syncdbtable()
