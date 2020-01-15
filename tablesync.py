@@ -64,17 +64,34 @@ class TableInterface:
         # process file
         print("Processing file...")
         instream = StringIO(snapshot)
-        df = (pd.read_csv(instream, dtype = str, 
+        df = (pd.read_csv(instream,
+                            sep = sync_cfg.get("sep",','), 
+                            dtype = str,
                             na_values=['None','none','NONE',""])
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
                 .replace(np.nan,'\\N')
             )
-        df = df[self.map_df[self.provider].values.tolist()]
-        df.columns = self.map_df[self.org].values.tolist()
-        df = df.dropna(axis = 1, how = 'all')
-
+        # concatenate columns with + in them
+        to_concat = self.map_df[self.provider].str.contains("+",regex=False)
+        for index in self.map_df[to_concat].index:
+            concat_col_name = self.map_df.loc[index, self.provider]
+            df[concat_col_name] = ""
+            concat_cols = self.map_df.loc[index, self.provider].split("+")
+            for col in concat_cols:
+                df[concat_col_name] = (
+                    df[concat_col_name]
+                        .str.cat(df[col], sep = " ")
+                        .str.lstrip()
+                ) 
+      
         # add new fields
         df['external_sys'] = self.provider
+
+        # select final columns
+        df = df[self.map_df[self.provider].values.tolist()]
+        # rename for re entry to DB 
+        df.columns = self.map_df[self.org].values.tolist()
+        df = df.dropna(axis = 1, how = 'all')
 
         # Process location from lat long to long lat (for PostGIS)
         geo_cols = (self.map_df
