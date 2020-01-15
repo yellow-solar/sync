@@ -17,12 +17,26 @@
             "tables":{
                 "accounts":"contracts",
                 "users":"",
-                "payments":"",
+                "payments":"payments",
                 "replacements":"",
-                "stock":"",
-                "applications":"",
-                "clients":""
-            }
+                "stock":"assets",
+                "applications":"applications",
+                "clients":"clients"
+            },
+            "sep":";"
+        },
+        "upya_test":{
+            "name":"upya",
+            "tables":{
+                "accounts":"contracts",
+                "users":"",
+                "payments":"payments",
+                "replacements":"",
+                "stock":"assets",
+                "applications":"applications",
+                "clients":"clients"
+            },
+            "sep":";"
         }
     },
     "core":{
