@@ -25,8 +25,9 @@ core_tables = config(filename='sync.json', section='core')
 #     for table in providers[provider].get('tables',[]).keys():
 #         print(table)
 
-provider = 'angaza'
-for table in providers[provider].get('tables',[]).keys():
-# for table in ['applications']:
+provider = 'upya_test'
+# for table in providers[provider].get('tables',[]).keys():
+for table in ['applications']:
     tablesync = TableInterface(provider,table)
-	tablesync.syncdbtable()
+    tablesync.fetchAndUploadProviderData()
+    # tablesync.syncdbtable()
