@@ -67,7 +67,7 @@ class TableInterface:
         df = (pd.read_csv(instream,
                             sep = sync_cfg.get("sep",','), 
                             dtype = str,
-                            na_values=['None','none','NONE',""])
+                            na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
                 .replace(np.nan,'\\N')
             )
