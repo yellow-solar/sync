@@ -71,6 +71,7 @@ class TableInterface:
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
                 .replace(np.nan,'\\N')
             )
+
         # concatenate columns with + in them
         to_concat = self.map_df[self.provider].str.contains("+",regex=False)
         for index in self.map_df[to_concat].index:
@@ -84,9 +85,6 @@ class TableInterface:
                         .str.lstrip()
                 ) 
       
-        # add new fields
-        df['external_sys'] = self.provider
-
         # select final columns
         df = df[self.map_df[self.provider].values.tolist()]
         # rename for re entry to DB 
@@ -99,6 +97,9 @@ class TableInterface:
         )
         for col in geo_cols:
             df[col] = df[col].apply(lambda x: " ".join(x.split(',')[::-1]))
+
+        # add new fields
+        df['external_sys'] = self.provider
 
         # Re-create table header in case different
         print("Re-creating table header...")

@@ -24,23 +24,14 @@
                 "clients":"clients"
             },
             "sep":";"
-        },
-        "upya_test":{
-            "name":"upya",
-            "tables":{
-                "accounts":"contracts",
-                "users":"",
-                "payments":"payments",
-                "replacements":"",
-                "stock":"assets",
-                "applications":"applications",
-                "clients":"clients"
-            },
-            "sep":";"
         }
     },
     "core":{
-        "accounts":{},
+        "accounts":{
+            "update_query":{
+                "sql":"select {} from core.accounts a where a.registration_date_utc is not null and a.zoho_id is not null"
+            }
+        },
         "users":{},
         "payments":{
             "update_query":{
