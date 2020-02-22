@@ -4,7 +4,7 @@
 import json
 
 
-def config(filename='config.json', section='yellowpgdbdev'):
+def config(section, filename='config.json'):
     """ function to return config of input and section """
    # Import from config file
     with open(filename) as json_data_file:

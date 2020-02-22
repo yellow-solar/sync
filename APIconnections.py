@@ -19,12 +19,14 @@ from requests.auth import HTTPBasicAuth
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
+# customer
+from config import config
+
 class providerAPI:
-    """ initalise Angaza API object to make snapshot, api updates etc. """
+    """ initalise provider API object to make snapshot, api updates etc. """
     def __init__(self, provider):
         # get config for provider
-        with open('config.json', 'r') as f:
-            cfg = json.load(f)[provider]
+        cfg = config("providers")[provider]
         # create api connection
         self.user = cfg.get('username',None)
         self.pswrd = cfg.get('password',None)
@@ -34,13 +36,13 @@ class providerAPI:
         self.sep = cfg.get('sep',",")
         self.tables = cfg['tables']
 
-    def pullSnapshot(self, tablename):
+    def pullSnapshot(self, tableurl):
         """ Download table from snapshot URL and correct for bad characters """
         # crete url based on tablename
-        url = self.snapshoturl+"/"+tablename
+        url = self.snapshoturl+"/"+tableurl
         if (self.headers is None):
             snapshot = requests.get(
-                f"{self.snapshoturl}/{tablename}", 
+                f"{self.snapshoturl}/{tableurl}", 
                 auth=HTTPBasicAuth(self.user, self.pswrd))
         else:
             snapshot = requests.get(

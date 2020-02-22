@@ -9,7 +9,7 @@ class yellowpgdb:
     """ Class for using the Yellow Postgres DB """
     def __init__(self):
         # Get db config
-        self.cfg = config.config()
+        self.cfg = config.config(section = "yellowpgdb")
 
     def get_engine(self, echo=False):
         engine = create_engine(

@@ -27,6 +27,8 @@ class TableInterface:
     # initialise
     def __init__(self, provider, table, core = 'core', org = 'yellow'):
         self.provider = provider
+        self.provider_cfg = config(section = "providers")[provider]
+        self.table_cfg = self.provider_cfg['tables'][table]
         self.table = table
         self.org = org
         self.core = core
@@ -39,7 +41,7 @@ class TableInterface:
         self.pk = (self.core_map
                     .loc[self.core_map['pk']==1,self.org].iloc[0])
         self.db = yellowpgdb()
-        self.core_cfg = config('sync.json', 'core').get(self.table, None)
+        self.core_cfg = config('solarcore').get(self.table, None)
         self.update_sql = self.core_cfg.get('update_query',None)
 
     def fetchAndUploadProviderData(self):
@@ -54,12 +56,12 @@ class TableInterface:
         print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         # sync config
-        sync_cfg = config(filename='sync.json', section='providers')[self.provider]
+        sync_cfg = config(section='providers')[self.provider]
 
         # provider connection and snapshots
         print(f"Fetching {self.provider} {self.table} file...")
         apiconn = providerAPI(self.provider)
-        snapshot = apiconn.pullSnapshot(sync_cfg['tables'][self.table])
+        snapshot = apiconn.pullSnapshot(self.table_cfg['url'])
 
         # process file
         print("Processing file...")
@@ -96,10 +98,13 @@ class TableInterface:
                     .loc[self.map_df['type']=='GEOGRAPHY',self.org]
         )
         for col in geo_cols:
-            df[col] = df[col].apply(lambda x: " ".join(x.split(',')[::-1]))
+            df[col] = df[col].apply(
+                lambda x: " ".join(x.split(',')[::-1]) if "\\N" not in x else "\\N"
+            )
 
         # add new fields
         df['external_sys'] = self.provider
+        df['organization'] = self.provider_cfg['organization']
 
         # Re-create table header in case different
         print("Re-creating table header...")
@@ -149,7 +154,7 @@ class TableInterface:
         return(select)
 
     
-    def _insertTableStatement(self):
+    def _insertTableStatement(self, filter_insert = None):
         # create the cast statements
         self.map_df_sys['select'] = (
             self.map_df_sys.apply(
@@ -164,10 +169,15 @@ class TableInterface:
         insert = f"INSERT INTO {self.core}.{self.table} ({cols_csv})"
         where = (f"""WHERE a.{self.update_on} 
                     NOT IN (select c.{self.update_on} 
-                    FROM {self.core}.{self.table} c)"""
+                    FROM {self.core}.{self.table} c)
+                """
         )
+        if filter_insert is not None:
+            where = where + " and " + filter_insert
+
         # join parts with new line chars
         insert_sql= "\n".join([insert, select, where])
+
         return(insert_sql)
 
     # 2. update 
@@ -192,7 +202,7 @@ class TableInterface:
         """ insert new and update existing records to core tables """
         # 1. insert all new
         print("Creating insert statement...")
-        insert_sql = self._insertTableStatement()
+        insert_sql = self._insertTableStatement(self.table_cfg.get('filter',None))
         print("Executing insert statement...")
         self.execute(insert_sql)
         # 2. update all the rest

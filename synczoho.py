@@ -19,7 +19,8 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     """ YDB <> Zoho insert or update using Pandas DF"""
     
     # set update criteria if required
-    update_on = tablesync.update_on if update else None
+    # update_on = tablesync.update_on if update else None
+    update_on = 'ID'
     insert_or_update = "Updated" if update else "Inserted"
 
     # Fetch DF
@@ -28,7 +29,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     cur.execute(sql)
     # Process results
     records = cur.fetchall()
-    colnames = [desc[0] for desc in cur.description]
+    colnames = [desc[0] if desc[0]!="zoho_id" else "ID" for desc in cur.description]
     # List of dicts which are zipped with field name
     record_dicts = [dict(zip(colnames, record)) for record in records]
     
@@ -73,7 +74,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
 def zohoSync(zoho_table, provider, zoho, dbupdate = False):
     # 0. Prep
     # zoho syc config
-    zohosync_cfg = config(filename='sync.json', section='zoho')[zoho_table]
+    zohosync_cfg = config(section='zoho')['sync_tables'][zoho_table]
     table = zohosync_cfg['table']
     form = zohosync_cfg['form']
     slice_length = zohosync_cfg['slice_length']
@@ -99,33 +100,34 @@ if __name__ == "__main__":
     when cron calls the zoho script, it must call with the form 
     name input 
     """
-    providers = config(filename='sync.json', section='providers')
-    zoho_tables = config(filename='sync.json', section='zoho')  
+    providers = config(section='providers')
+    zoho_tables = config(section='zoho')['sync_tables']  
 
     # Loop through all providers
     provider = 'angaza'
     # for provider in providers:  
     
-
     # Fetch zoho cfg and setup API connection object
-    zoho_cfg = config(filename='config.json', section='zoho')
+    zoho_cfg = config(section='zoho')
     zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
-    # assign form from sys.args (1st is the )
-    # if len(sys.argv) > 1:
-    #     zoho_table = sys.argv[1]
-    # else:
-    #     # raise Exception("Expecting form as argument to call upload")
-    #     zoho_table = 'accounts'
-
     # loop through each table in zoho
-    for zoho_table in zoho_tables:
-        print(zoho_table)
-        zohoSync(zoho_table, provider, zoho, dbupdate=True)
+    env = config('env')
+    if env == 'prod':            
+        # for zoho_table in zoho_tables:
+        for zoho_table in ['users']:
+            print(zoho_table)
+            zohoSync(zoho_table, provider, zoho, dbupdate=False)
 
-    # To run only the zoho update for one table
-    # for zoho_table in ['applications']:
-    #     print(zoho_table)
-    #     zohoSync(zoho_table, provider, zoho, dbupdate=False)
+        # To run only the zoho update for one table
+        # for zoho_table in ['applications']:
+        #     print(zoho_table)
+        #     zohoSync(zoho_table, provider, zoho, dbupdate=False)
+        #  
+        
+    else:
+        print("Can only update Zoho in prod")
+
+    
 
     
