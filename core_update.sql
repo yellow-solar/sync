@@ -184,8 +184,8 @@ set responsible_user_id = b.responsible_user_id
 	, responsible_user_ext_id = b.responsible_user_external_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
-	and a.external_sys = 'upya'
 	and a.responsible_user_id is null
+	and a.effective_utc >= cast('2020-02-22' as timestamp) 
 ;
 
 

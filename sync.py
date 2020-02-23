@@ -34,8 +34,8 @@ for provider in providers:
 # for provider in ['upya']:
     print('------')
     print(provider)
-    for table in TABLES:
-    # for table in providers[provider].get('tables',[]).keys():
+    # for table in TABLES:
+    for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
         tablesync.syncdbtable()
@@ -59,11 +59,11 @@ print("--------------------------------------")
 # zoho_cfg = config(section='zoho')
 # zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
-# # loop through each table in zoho
+# # # loop through each table in zoho
 # env = config('env')
 # if env == 'prod':            
 #     # for zoho_table in zoho_tables:
-#     for zoho_table in TABLES:
+#     for zoho_table in ['payments']:
 #         print(zoho_table)
 #         zohoSync(zoho_table, provider, zoho)
 # else:
