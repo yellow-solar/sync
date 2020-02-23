@@ -110,7 +110,7 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['users']:
+        for zoho_table in ['payments']:
             print(zoho_table)
             zohoSync(zoho_table, provider, zoho)
     else:
