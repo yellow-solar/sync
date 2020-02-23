@@ -31,7 +31,7 @@ from core.applications b
 where a.application_external_id = b.application_external_id
 ;
 
------------------------ CREATE COLUMNS  -------------------------- 
+----------------------- ACCOUNT COLUMNS  -------------------------- 
 
 -- UPDATE THE HOUR PRICE
 update core.accounts a
@@ -88,13 +88,23 @@ where a.account_external_id is not null
 	and a.external_sys != 'angaza'
 ;
 
+------ OTHER TABLES -----------------
+
 -- UPDATE THE EXTERNAL_SYS for the USERS
 update core.users a 
 set external_sys = 'angaza and upya'
 where a.user_upya_id is not null and a.user_angaza_id is not null
 ;
 
+
+
 -----------------------  FOREIGN KEYS -------------------------- 
+
+-- product ID
+-- pricing group ID
+-- manufacturer ID
+
+
 -- updat client ID to get client details
 update core.accounts a
 set client_id = b.client_id
@@ -130,28 +140,19 @@ from core.accounts b
 where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
 ;
+
 -- UNIT NUMBER, ACCOUNT ID in Applications
 update core.applications a
 set unit_number = b.unit_number
-	, account_external_id = b.account_external_id
+	, account_id = b.account_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
 	and a.external_sys = 'upya'
 	and a.status = 'DEPLOYED'
 ;
 
-
 -- AGENT AND USERS ID IN ACCOUNTS, APPLICATIONS
 -- registering, 
-
--- responsible user
-update core.accounts a
-set responsible_user_id = b.user_id
-from core.users b
-where a.responsible_user_external_id = b.user_angaza_id
-	or a.responsible_user_external_id = b.user_upya_id
-;
-
 -- recorder id,  responsible user id in applications
 update core.applications a
 set responsible_user_id = b.user_id
@@ -166,6 +167,28 @@ from core.users b
 where a.recorder_ext_id = b.user_angaza_id
 	or a.recorder_ext_id = b.user_upya_id
 ;
+
+-- UNIT NUMBER, ACCOUNT ID  in PAYMENTS
+update core.payments a
+set unit_number = b.unit_number
+	, account_id = b.account_id
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and a.external_sys = 'upya'
+;
+
+-- RESPONSIBLE USER in PAYMENTS
+update core.payments a
+set responsible_user_id = b.responsible_user_id
+	, responsible_user = b.responsible_user
+	, responsible_user_ext_id = b.responsible_user_external_id
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and a.external_sys = 'upya'
+	and a.responsible_user_id is null
+;
+
+
 
 -- COUNTRY
 update core.accounts a
