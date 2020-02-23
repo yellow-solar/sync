@@ -30,15 +30,15 @@ core_tables = config(section='solarcore')
 #         print(table)
 TABLES = ['payments','accounts']
 
-for provider in providers:
-# for provider in ['upya']:
+# for provider in providers:
+for provider in ['upya']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
-        tablesync.syncdbtable()
+        # tablesync.syncdbtable()
         # tablesync.internalSync()
         
 ### Run the custom mapping
@@ -56,15 +56,15 @@ print("--------------------------------------")
 
 ### update zoho
 # Fetch zoho cfg and setup API connection object
-# zoho_cfg = config(section='zoho')
-# zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
+zoho_cfg = config(section='zoho')
+zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
-# # # loop through each table in zoho
-# env = config('env')
-# if env == 'prod':            
-#     # for zoho_table in zoho_tables:
-#     for zoho_table in ['payments']:
-#         print(zoho_table)
-#         zohoSync(zoho_table, provider, zoho)
-# else:
-#     print("Can only update Zoho in prod")
+# # loop through each table in zoho
+env = config('env')
+if env == 'prod':            
+    # for zoho_table in zoho_tables:
+    for zoho_table in ['users']:
+        print(f"Zoho Import Sync: {zoho_table}")
+        zohoSync(zoho_table, provider, zoho)
+else:
+    print("Can only update Zoho in prod")

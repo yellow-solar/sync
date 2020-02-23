@@ -111,7 +111,7 @@ if __name__ == "__main__":
     if env == 'prod':            
         # for zoho_table in zoho_tables:
         for zoho_table in ['payments']:
-            print(zoho_table)
+            print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, provider, zoho)
     else:
         print("Can only update Zoho in prod")
