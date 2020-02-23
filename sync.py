@@ -28,14 +28,14 @@ core_tables = config(section='solarcore')
 #     print(provider)
 #     for table in providers[provider].get('tables',[]).keys():
 #         print(table)
-TABLES = ['clients']
+TABLES = ['payments','accounts']
 
 for provider in providers:
 # for provider in ['upya']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
         tablesync.syncdbtable()
