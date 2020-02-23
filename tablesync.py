@@ -8,6 +8,7 @@ import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from psycopg2.extensions import AsIs
 
 # Connection modules
 from APIconnections import providerAPI
@@ -43,6 +44,7 @@ class TableInterface:
         self.db = yellowpgdb()
         self.core_cfg = config('solarcore').get(self.table, None)
         self.update_sql = self.core_cfg.get('update_query',None)
+        self.connect()
 
     def fetchAndUploadProviderData(self):
         """  Function to sync a specifc table from specific provider 
@@ -73,7 +75,7 @@ class TableInterface:
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
                 .replace(np.nan,'\\N')
             )
-
+        
         # concatenate columns with + in them
         to_concat = self.map_df[self.provider].str.contains("+",regex=False)
         for index in self.map_df[to_concat].index:
@@ -99,10 +101,15 @@ class TableInterface:
                         .str.lstrip()
                 ) 
       
-        # select final columns
-        df = df[self.map_df[self.provider].values.tolist()]
+        # get the mapped columns that are actually in the df
+        mapped_cols_in_df = [x for x in self.map_df[self.provider].values.tolist() if x in df.columns]
+        # filter table for cols that are mapped
+        df = df[mapped_cols_in_df]
+        # get the target colnames that exist
+        renamed_cols_in_df = self.map_df.loc[self.map_df[self.provider].isin(mapped_cols_in_df), self.org].values.tolist()
         # rename for re entry to DB 
-        df.columns = self.map_df[self.org].values.tolist()
+        df.columns = renamed_cols_in_df
+        # drop any blank rows
         df = df.dropna(axis = 1, how = 'all')
 
         # Process location from lat long to long lat (for PostGIS)
@@ -215,7 +222,9 @@ class TableInterface:
                 - if not users then extend table
                 - if users then update on user_email
         """
-        # if self.table != "users":
+        # 0. update self.map with actual columns that are in the staging table
+        cols = self._getStagingColNames()
+        self.map_df_sys = self.map_df_sys.loc[self.map_df_sys[self.org].isin(cols)]
         # 1. insert all new
         print("Creating insert statement...")
         insert_sql = self._insertTableStatement(self.table_cfg.get('filter',None))
@@ -254,6 +263,13 @@ class TableInterface:
         if update and self.update_sql is not None:  
             sql = self.update_sql['sql'].format(cols)
         return(sql)
+
+    def _getStagingColNames(self):
+        curs = self.db_conn.cursor()
+        tablepath = self.provider + "." + self.table
+        curs.execute('select * FROM %s.%s LIMIT 0', (AsIs(self.provider), AsIs(self.table)))
+        colnames = [desc[0] for desc in curs.description] 
+        return(colnames)
 
     def connect(self):
         self.db_conn = self.db.connect()

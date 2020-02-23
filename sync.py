@@ -28,18 +28,19 @@ core_tables = config(section='solarcore')
 #     print(provider)
 #     for table in providers[provider].get('tables',[]).keys():
 #         print(table)
-TABLES = ['payments']
+TABLES = ['accounts']
 
-for provider in providers:
-# for provider in ['upya']:
+# for provider in providers:
+for provider in ['upya']:
     print('------')
     print(provider)
     # for table in TABLES:
     for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
-        tablesync.syncdbtable()
-
+        # tablesync.syncdbtable()
+        tablesync.internalSync()
+        
 ### Run the custom mapping
 print("--------------------------------------")
 print("Running the core update sql script....")
