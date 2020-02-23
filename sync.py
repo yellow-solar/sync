@@ -38,8 +38,6 @@ for provider in providers:
     for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
-        # tablesync.fetchAndUploadProviderData()
-        # tablesync.internalSync()
         tablesync.syncdbtable()
 
 ### Run the custom mapping
