@@ -188,8 +188,6 @@ where a.account_external_id = b.account_external_id
 	and a.effective_utc >= cast('2020-02-22' as timestamp) 
 ;
 
-
-
 -- COUNTRY
 update core.accounts a
 set country_id = b.country_id
