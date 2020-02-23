@@ -86,6 +86,18 @@ class TableInterface:
                         .str.cat(df[col], sep = " ")
                         .str.lstrip()
                 ) 
+        # concatenate columns with + in them
+        to_concat = self.map_df[self.provider].str.contains("|",regex=False)
+        for index in self.map_df[to_concat].index:
+            concat_col_name = self.map_df.loc[index, self.provider]
+            df[concat_col_name] = ""
+            concat_cols = self.map_df.loc[index, self.provider].split("|")
+            for col in concat_cols:
+                df[concat_col_name] = (
+                    df[concat_col_name]
+                        .str.cat(df[col], sep = "")
+                        .str.lstrip()
+                ) 
       
         # select final columns
         df = df[self.map_df[self.provider].values.tolist()]
@@ -199,7 +211,11 @@ class TableInterface:
         return(update_sql)
 
     def internalSync(self):
-        """ insert new and update existing records to core tables """
+        """ insert new and update existing records to core tables 
+                - if not users then extend table
+                - if users then update on user_email
+        """
+        # if self.table != "users":
         # 1. insert all new
         print("Creating insert statement...")
         insert_sql = self._insertTableStatement(self.table_cfg.get('filter',None))

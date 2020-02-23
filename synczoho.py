@@ -20,7 +20,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     
     # set update criteria if required
     # update_on = tablesync.update_on if update else None
-    update_on = 'ID'
+    update_on = 'ID' if update else None
     insert_or_update = "Updated" if update else "Inserted"
 
     # Fetch DF
@@ -71,22 +71,18 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 ### if it excepts then we need to delete the new inserts and IDs?
                 raise Exception("Failed to process response")
 
-def zohoSync(zoho_table, provider, zoho, dbupdate = False):
+def zohoSync(zoho_table, provider, zoho):
     # 0. Prep
     # zoho syc config
     zohosync_cfg = config(section='zoho')['sync_tables'][zoho_table]
     table = zohosync_cfg['table']
     form = zohosync_cfg['form']
     slice_length = zohosync_cfg['slice_length']
-    update_ydb = zohosync_cfg.get('update_ydb',dbupdate)
+    # update_ydb = zohosync_cfg.get('update_ydb',dbupdate)
 
     # YDB table config
     tablesync = TableInterface(provider,table)
     tablesync.connect()
-
-    if update_ydb:
-        # 1. Update Providers > DB
-        tablesync.syncdbtable()
 
     # 2. Update Zoho <> YDB
     # Update the old records to Zoho - update first because inserts don't need to be
@@ -103,10 +99,9 @@ if __name__ == "__main__":
     providers = config(section='providers')
     zoho_tables = config(section='zoho')['sync_tables']  
 
-    # Loop through all providers
+    # Set any provider -> irrelevent for this update
     provider = 'angaza'
-    # for provider in providers:  
-    
+
     # Fetch zoho cfg and setup API connection object
     zoho_cfg = config(section='zoho')
     zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
@@ -117,14 +112,7 @@ if __name__ == "__main__":
         # for zoho_table in zoho_tables:
         for zoho_table in ['users']:
             print(zoho_table)
-            zohoSync(zoho_table, provider, zoho, dbupdate=False)
-
-        # To run only the zoho update for one table
-        # for zoho_table in ['applications']:
-        #     print(zoho_table)
-        #     zohoSync(zoho_table, provider, zoho, dbupdate=False)
-        #  
-        
+            zohoSync(zoho_table, provider, zoho)
     else:
         print("Can only update Zoho in prod")
 

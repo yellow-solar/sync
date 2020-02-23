@@ -14,24 +14,58 @@ from tablesync import TableInterface
 from yellowpgdb import yellowpgdb
 from config import config
 from APIconnections import ZohoAPI
+from synczoho import zohoSync
 
 # YDB table config 
 providers = config(section='providers')
 core_tables = config(section='solarcore')
+
+
+### Update the tables
 
 # for provider in providers:  
 #     print('------')
 #     print(provider)
 #     for table in providers[provider].get('tables',[]).keys():
 #         print(table)
+TABLES = ['users','applications']
 
-provider = 'upya'
-# for table in providers[provider].get('tables',[]).keys():
-for table in ['applications','accounts', 'clients','stock', 'payments','users']:
-# for table in ['stock']:
-    tablesync = TableInterface(provider,table)
-    tablesync.fetchAndUploadProviderData()
-    tablesync.internalSync()
-    # tablesync.syncdbtable()
+for provider in providers:
+    # for table in providers[provider].get('tables',[]).keys():
+    print('------')
+    print(provider)
+    for table in TABLES:
+        # for table in ['stock']:
+        tablesync = TableInterface(provider,table)
+        # tablesync.fetchAndUploadProviderData()
+        # tablesync.internalSync()
+        tablesync.syncdbtable()
 
 
+### Run the custom mapping
+print("--------------------------------------")
+print("Running the core update sql script....")
+db = yellowpgdb()
+conn = db.connect()
+with conn.cursor() as cursor:
+    cursor.execute(open("core_update.sql", "r").read())
+# commit and close
+conn.commit()
+conn.close()
+print("Successfully updated core tables.")
+print("--------------------------------------")
+
+### update zoho
+# Fetch zoho cfg and setup API connection object
+zoho_cfg = config(section='zoho')
+zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
+
+# loop through each table in zoho
+env = config('env')
+if env == 'prod':            
+    # for zoho_table in zoho_tables:
+    for zoho_table in TABLES:
+        print(zoho_table)
+        zohoSync(zoho_table, provider, zoho)
+else:
+    print("Can only update Zoho in prod")

@@ -30,7 +30,8 @@ class yellowpgdb:
                                 port=self.cfg['port'],
                                 database=self.cfg['db'],
                                 user=self.cfg['user'],
-                                password=self.cfg['password'])
+                                password=self.cfg['password'],
+                    )
             return(conn)
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)       
