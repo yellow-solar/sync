@@ -32,7 +32,7 @@ for provider in providers:
     for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
-        # tablesync.syncdbtable()
+        tablesync.syncdbtable()
         # tablesync.internalSync()
         
 ### Run the custom mapping
@@ -56,7 +56,7 @@ zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
-    for zoho_table in zoho_tables:
+    for zoho_table in zoho_cfg['sync_tables'].keys()]:
     # for zoho_table in ['users']:
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, provider, zoho)
