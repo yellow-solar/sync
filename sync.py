@@ -28,18 +28,18 @@ core_tables = config(section='solarcore')
 #     print(provider)
 #     for table in providers[provider].get('tables',[]).keys():
 #         print(table)
-TABLES = ['accounts']
+TABLES = ['clients']
 
-# for provider in providers:
-for provider in ['upya']:
+for provider in providers:
+# for provider in ['upya']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         # for table in ['stock']:
         tablesync = TableInterface(provider,table)
-        # tablesync.syncdbtable()
-        tablesync.internalSync()
+        tablesync.syncdbtable()
+        # tablesync.internalSync()
         
 ### Run the custom mapping
 print("--------------------------------------")
