@@ -24,7 +24,7 @@ core_tables = config(section='solarcore')
 TABLES = ['stock']
 
 # for provider in providers:
-for provider in ['angaza']:
+for provider in ['upya']:
     print('------')
     print(provider)
     for table in TABLES:
@@ -55,8 +55,8 @@ zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
-    for zoho_table in zoho_cfg['sync_tables'].keys():
-    # for zoho_table in ['users']:
+    # for zoho_table in zoho_cfg['sync_tables'].keys():
+    for zoho_table in ['stock']:
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, provider, zoho)
 else:

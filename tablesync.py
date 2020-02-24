@@ -102,9 +102,8 @@ class TableInterface:
                         .str.lstrip()
                 ) 
 
-        # replace null columns
-        df = df.replace(np.nan,'\\N')
         
+
         # get the mapped columns that are actually in the df
         mapped_cols_in_df = [x for x in self.map_df[self.provider].values.tolist() if x in df.columns]
         # filter table for cols that are mapped
@@ -142,7 +141,8 @@ class TableInterface:
 
         # Create stringIO stream, and set cursore to start
         outstream = StringIO()
-        df.to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
+        # replace null and stream out
+        df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
         outstream.seek(0)
 
         # Upload contents

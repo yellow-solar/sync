@@ -11,7 +11,7 @@ from core.accounts b
 where a.account_external_id = b.account_external_id
 ;
 
--- MAP THE PRODUCT
+-- MAP THE PRODUCT - stock and accounts
 update core.accounts a
 set product = prod.target
 from core.accounts b
@@ -19,6 +19,16 @@ from core.accounts b
 		on prod.col = 'PRODUCT'
 		and prod.val = b.product
 where a.account_external_id = b.account_external_id
+;
+
+-- MAP THE PRODUCT
+update core.stock a
+set product = prod.target
+from core.stock b
+	join upya.columnmaps prod
+		on prod.col = 'PRODUCT'
+		and prod.val = b.product
+where a.asset_number = b.asset_number
 ;
 
 -- MAP THE APPLICATION STATUS
@@ -30,6 +40,18 @@ from core.applications b
 		and app_status.val = b.status
 where a.application_external_id = b.application_external_id
 ;
+
+-- MAP THE STOCK STATUSES 
+-- transit_state
+update core.stock a
+set transit_state = transit.target
+from core.stock b
+	join upya.columnmaps transit
+		on transit.col = 'TRANSIT_STATE'
+		and transit.val = b.transit_state
+where a.asset_number = b.asset_number
+;
+
 
 ----------------------- ACCOUNT COLUMNS  -------------------------- 
 
@@ -132,6 +154,11 @@ from core.applications b
 where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
 ;
+update core.accounts a
+set unit_number = asset_number
+where unit_number is null
+	and asset_number is not null
+;
 
 -- ACCOUNT ID in APPLICATIONS
 update core.applications a
@@ -186,6 +213,15 @@ from core.accounts b
 where a.account_external_id = b.account_external_id
 	and a.responsible_user_id is null
 	and a.effective_utc >= cast('2020-02-22' as timestamp) 
+;
+
+
+-- HOLDER USER in STOCK
+update core.stock a
+set holder_id = b.user_id
+from core.users b
+where a.holder_external_id = user_angaza_id 
+	or a.holder_external_id = user_upya_id
 ;
 
 -- COUNTRY
