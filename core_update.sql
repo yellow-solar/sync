@@ -138,7 +138,7 @@ where a.client_external_id = b.client_external_id
 update core.accounts a
 set stock_id = b.stock_id
 from core.stock b
-where a.unit_number = b.unit_number
+where a.asset_number = b.asset_number
 ;
 update core.accounts a
 set stock_id = null
@@ -166,6 +166,19 @@ set account_id = b.account_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
+;
+-- ACCOUNT ID in STOCK
+update core.stock a
+set account_id = b.account_id
+from core.accounts b
+where a.asset_number = b.asset_number
+	and b.asset_number is not null
+;
+update core.stock a
+set account_id = null
+from core.accounts b
+where a.account_id = b.account_id
+	and b.asset_number is null
 ;
 
 -- UNIT NUMBER, ACCOUNT ID in Applications
