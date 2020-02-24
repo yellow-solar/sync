@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from psycopg2.extensions import AsIs
+import csv
 
 # Connection modules
 from APIconnections import providerAPI
