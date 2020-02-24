@@ -121,7 +121,7 @@ class TableInterface:
         )
         for col in geo_cols:
             df[col] = df[col].apply(
-                lambda x: " ".join(x.split(',')[::-1]) if "\\N" not in x else "\\N"
+                lambda x: " ".join(x.split(',')[::-1]) if x is not np.NaN else x
             )
 
         # add new fields
