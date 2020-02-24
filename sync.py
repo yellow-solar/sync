@@ -23,8 +23,8 @@ core_tables = config(section='solarcore')
 ### Update the tables
 TABLES = ['stock']
 
-# for provider in providers:
-for provider in ['upya']:
+for provider in providers:
+# for provider in ['upya']:
     print('------')
     print(provider)
     for table in TABLES:
