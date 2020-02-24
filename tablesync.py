@@ -138,7 +138,7 @@ class TableInterface:
 
         # Create stringIO stream, and set cursore to start
         outstream = StringIO()
-        df.to_csv(outstream, sep='\t', header=False, index=False, doublequote = False)
+        df.to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
         outstream.seek(0)
 
         # Upload contents
