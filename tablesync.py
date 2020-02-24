@@ -74,7 +74,6 @@ class TableInterface:
                             dtype = str,
                             na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
-                .replace(np.nan,'\\N')
             )
         
         # concatenate columns with + in them
@@ -89,7 +88,8 @@ class TableInterface:
                         .str.cat(df[col], sep = " ")
                         .str.lstrip()
                 ) 
-        # concatenate columns with + in them
+
+        # concatenate columns with | in them
         to_concat = self.map_df[self.provider].str.contains("|",regex=False)
         for index in self.map_df[to_concat].index:
             concat_col_name = self.map_df.loc[index, self.provider]
@@ -101,7 +101,10 @@ class TableInterface:
                         .str.cat(df[col], sep = "")
                         .str.lstrip()
                 ) 
-      
+
+        # replace null columns
+        df = df.replace(np.nan,'\\N')
+        
         # get the mapped columns that are actually in the df
         mapped_cols_in_df = [x for x in self.map_df[self.provider].values.tolist() if x in df.columns]
         # filter table for cols that are mapped
