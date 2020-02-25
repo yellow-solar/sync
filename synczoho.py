@@ -64,7 +64,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                     """
                     cur.execute(update_sql, row)
                     counter+=1
-                    print(f"Inserted {counter} of {len(ids)}")
+                    # print(f"Inserted {counter} of {len(ids)}")
                 tablesync.db_conn.commit()
                 print(f"Inserted {len(ids)} IDs to YDB")
             except:
