@@ -1,5 +1,6 @@
 config.json
 config_*
+googleserv*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

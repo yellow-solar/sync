@@ -15,6 +15,10 @@ from yellowpgdb import yellowpgdb
 from config import config
 from APIconnections import ZohoAPI
 from synczoho import zohoSync
+from googleapi.gmail import Gmail
+
+# email config
+gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 
 # YDB table config 
 providers = config(section='providers')
@@ -29,10 +33,18 @@ for provider in providers:
     print(provider)
     # for table in TABLES:
     for table in providers[provider].get('tables',[]).keys():
-        tablesync = TableInterface(provider,table)
-        tablesync.syncdbtable()
-        # tablesync.internalSync()
-        
+        try:
+            tablesync = TableInterface(provider,table)
+            tablesync.syncdbtable()
+        except:
+            # send an email notifying failure
+            gmail.quick_send(
+                to = 'ben@yellow.africa, ross@yellow.africa',
+                subject = f"DB sync event failed: {provider}.{table}",
+                text = "See AWS log for details",
+            )
+            print(f"{provider} {table} download and DB sync failed.")
+
 ### Run the custom mapping
 print("--------------------------------------")
 print("Running the core update sql script....")
