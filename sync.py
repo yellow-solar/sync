@@ -25,9 +25,9 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-### Update the tables
 TABLES = ['clients']
 
+### Update the Yellow DB tables
 for provider in providers:
 # for provider in ['upya']:
     print('------')
@@ -72,9 +72,16 @@ zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 env = config('env')
 if env == 'prod':            
     for zoho_table in zoho_cfg['sync_tables'].keys():
-    # for zoho_table in ['stock']:
+    # for zoho_table in ['users']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, provider, zoho)
+
+    # Run the upload sync checker to look for new values
+    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":"Upload_Sync_Checks"}) 
+    if check.status_code==200:
+        print("Upload sync checked")
+    else: 
+        print(check.text)
 else:
     print("Can only update Zoho in prod")

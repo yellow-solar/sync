@@ -116,6 +116,12 @@ if __name__ == "__main__":
     else:
         print("Can only update Zoho in prod")
 
+    # Run the upload sync checker to look for new values
+    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","form":form,"command_string":"Upload_Sync_Checks"}) 
+    if check.status_code==200:
+        print("Upload sync checked")
+    else: 
+        print(check.text)
     
 
     
