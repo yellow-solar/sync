@@ -7,6 +7,7 @@ import datetime
 # third party
 import pandas as pd
 import numpy as np
+import traceback
 
 # custom imports
 import tablesync
@@ -25,7 +26,7 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 ### Update the tables
-TABLES = ['stock']
+TABLES = ['clients']
 
 for provider in providers:
 # for provider in ['upya']:
@@ -36,14 +37,18 @@ for provider in providers:
         try:
             tablesync = TableInterface(provider,table)
             tablesync.syncdbtable()
-        except:
+        except Exception as e: 
+            # show failure
+            print(f"{provider} {table} download and DB sync failed.")
+            print('-------------------------------------------------')
+            # print traceback
+            traceback.print_exc()
             # send an email notifying failure
             gmail.quick_send(
                 to = 'ben@yellow.africa, ross@yellow.africa',
                 subject = f"DB sync event failed: {provider}.{table}",
-                text = "See AWS log for details",
-            )
-            print(f"{provider} {table} download and DB sync failed.")
+                text = f"See AWS log for details <br>{e}",
+            )         
 
 ### Run the custom mapping
 print("--------------------------------------")
@@ -68,6 +73,7 @@ env = config('env')
 if env == 'prod':            
     for zoho_table in zoho_cfg['sync_tables'].keys():
     # for zoho_table in ['stock']:
+        print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, provider, zoho)
 else:
