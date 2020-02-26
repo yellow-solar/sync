@@ -53,7 +53,7 @@ where a.asset_number = b.asset_number
 ;
 
 
------------------------ ACCOUNT COLUMNS  -------------------------- 
+----------------------- RECALCULATE ACCOUNT COLUMNS  -------------------------- 
 
 -- UPDATE THE HOUR PRICE
 update core.accounts a
@@ -110,8 +110,6 @@ where a.account_external_id is not null
 	and a.external_sys != 'angaza'
 ;
 
------- OTHER TABLES -----------------
-
 -- UPDATE THE EXTERNAL_SYS for the USERS
 update core.users a 
 set external_sys = 'angaza and upya'
@@ -127,26 +125,97 @@ where a.user_upya_id is not null and a.user_angaza_id is not null
 -- manufacturer ID
 
 
--- updat client ID to get client details
+---- APPLICATIONS -----
+
+-- Account external id
+update core.applications a
+set account_external_id = b.account_external_id
+from core.accounts b
+where a.application_external_id = b.account_external_id
+		and b.account_external_id is not null
+;
+
+-- Account ID
+update core.applications a
+set account_id = b.account_id
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and b.account_external_id is not null
+;
+
+-- Unit number
+update core.applications a
+set unit_number = b.unit_number
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and a.external_sys = 'upya'
+	and a.status = 'DEPLOYED'
+;
+
+--  Recorder user ID
+update core.applications a
+set recorder_id = b.user_id
+	, recorder = b.full_name
+from core.users b
+where a.recorder_ext_id = b.user_angaza_id
+	or a.recorder_ext_id = b.user_upya_id
+;
+
+--  Recorder user name
+update core.applications a
+set recorder = b.full_name
+from core.users b
+where a.recorder is null and
+	(
+		a.recorder_ext_id = b.user_angaza_id
+		or a.recorder_ext_id = b.user_upya_id
+	)
+;
+
+-- Note/credit decision user
+update core.applications a
+set note_recorder = b.full_name
+	, note_recorder_id = b.user_id
+from core.users b
+where (a.note_recorder_external_id = b.user_angaza_id or a.note_recorder_external_id = b.user_upya_id)
+	and b.user_id is not null
+;
+
+-- Responsible user ID
+update core.applications a
+set responsible_user_id = b.user_id
+from core.users b
+where (a.responsible_user_ext_id = b.user_angaza_id or a.responsible_user_ext_id = b.user_upya_id)
+	and b.user_id is not null
+;
+
+
+---- CLIENTS -----
+
+-- update client ID to get client details
 update core.accounts a
 set client_id = b.client_id
 from core.clients b
 where a.client_external_id = b.client_external_id
 ;
 
--- STOCK ID in accounts
+---- ACCOUNTS -----
+
+-- Stock ID
+-- input stock id if null
 update core.accounts a
 set stock_id = b.stock_id
 from core.stock b
 where a.asset_number = b.asset_number
 ;
+-- remove if detached, write-off
 update core.accounts a
 set stock_id = null
 	, unit_number = null 
-where a.account_status = 'DETACHED'
+where a.account_status in ('DETACHED', 'WRITTEN_OFF')
 ;
 
--- APPLICATION IDs IN ACCOUNTS
+-- Application IDs
 update core.accounts a
 set application_id = b.application_id
 	, application_external_id = b.application_external_id
@@ -154,26 +223,51 @@ from core.applications b
 where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
 ;
+
+-- Unit Number
 update core.accounts a
 set unit_number = asset_number
+from core.users b
 where unit_number is null
 	and asset_number is not null
 ;
 
--- ACCOUNT ID in APPLICATIONS
-update core.applications a
-set account_id = b.account_id
-from core.accounts b
-where a.account_external_id = b.account_external_id
-	and b.account_external_id is not null
+-- Registering user ID
+update core.accounts a
+set registering_user_id = b.user_id
+from core.users b
+where a.registering_user_external_id = b.user_angaza_id
+	or a.registering_user_external_id = b.user_upya_id
 ;
--- ACCOUNT ID in STOCK
+
+-- Registering user name
+update core.accounts a
+set registering_user = b.full_name
+from core.users b
+where a.registering_user is null and
+	(a.registering_user_external_id = b.user_angaza_id
+	or a.registering_user_external_id = b.user_upya_id)
+;
+
+-- Responsible user
+update core.accounts a
+set responsible_user_id = b.user_id
+from core.users b
+where a.responsible_user_external_id = b.user_angaza_id
+	or a.responsible_user_external_id = b.user_upya_id
+;
+
+---- STOCK -----
+
+-- Account ID
+-- input if there is a deployed account
 update core.stock a
 set account_id = b.account_id
 from core.accounts b
 where a.asset_number = b.asset_number
 	and b.asset_number is not null
 ;
+-- remove if there isn't one
 update core.stock a
 set account_id = null
 from core.accounts b
@@ -181,34 +275,18 @@ where a.account_id = b.account_id
 	and b.asset_number is null
 ;
 
--- UNIT NUMBER, ACCOUNT ID in Applications
-update core.applications a
-set unit_number = b.unit_number
-	, account_id = b.account_id
-from core.accounts b
-where a.account_external_id = b.account_external_id
-	and a.external_sys = 'upya'
-	and a.status = 'DEPLOYED'
-;
-
--- AGENT AND USERS ID IN ACCOUNTS, APPLICATIONS
--- registering, 
--- recorder id,  responsible user id in applications
-update core.applications a
-set responsible_user_id = b.user_id
+-- HOLDER USER ID
+update core.stock a
+set holder_id = b.user_id
 from core.users b
-where a.responsible_user_ext_id = b.user_angaza_id
-	or a.responsible_user_ext_id = b.user_upya_id
+where a.holder_external_id = user_angaza_id 
+	or a.holder_external_id = user_upya_id
 ;
 
-update core.applications a
-set recorder_id = b.user_id
-from core.users b
-where a.recorder_ext_id = b.user_angaza_id
-	or a.recorder_ext_id = b.user_upya_id
-;
 
--- UNIT NUMBER, ACCOUNT ID  in PAYMENTS
+---- PAYMENTS -----
+
+-- UNIT NUMBER, ACCOUNT ID 
 update core.payments a
 set unit_number = b.unit_number
 	, account_id = b.account_id
@@ -217,7 +295,7 @@ where a.account_external_id = b.account_external_id
 	and a.external_sys = 'upya'
 ;
 
--- RESPONSIBLE USER in PAYMENTS
+-- RESPONSIBLE USER
 update core.payments a
 set responsible_user_id = b.responsible_user_id
 	, responsible_user = b.responsible_user
@@ -226,15 +304,6 @@ from core.accounts b
 where a.account_external_id = b.account_external_id
 	and a.responsible_user_id is null
 	and a.effective_utc >= cast('2020-02-22' as timestamp) 
-;
-
-
--- HOLDER USER in STOCK
-update core.stock a
-set holder_id = b.user_id
-from core.users b
-where a.holder_external_id = user_angaza_id 
-	or a.holder_external_id = user_upya_id
 ;
 
 -- COUNTRY

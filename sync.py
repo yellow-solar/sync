@@ -2,7 +2,7 @@
 
 # syslibrary
 import os,sys
-import datetime 
+from datetime import datetime
 
 # third party
 import pandas as pd
@@ -25,7 +25,7 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-TABLES = ['clients']
+TABLES = ['accounts']
 
 ### Update the Yellow DB tables
 for provider in providers:
@@ -85,3 +85,6 @@ if env == 'prod':
         print(check.text)
 else:
     print("Can only update Zoho in prod")
+
+print("--------------------------------------")
+print("Completed Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
