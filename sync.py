@@ -28,12 +28,12 @@ core_tables = config(section='solarcore')
 TABLES = ['stock','accounts']
 
 ### Update the Yellow DB tables
-for provider in providers:
-# for provider in ['upya']:
+# for provider in providers:
+for provider in ['upya']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         try:
             tablesync = TableInterface(provider,table)
             tablesync.syncdbtable()
@@ -57,7 +57,11 @@ print("Running the core update sql script....")
 db = yellowpgdb()
 conn = db.connect()
 with conn.cursor() as cursor:
-    cursor.execute(open("core_update.sql", "r").read())
+    cursor.execute(open("coreupdate.sql", "r").read())
+    # update replacements if prod
+    if config('env') == 'prod':
+        cursor.execute(open("replacements.sql", "r").read())
+
 # commit and close
 conn.commit()
 conn.close()
