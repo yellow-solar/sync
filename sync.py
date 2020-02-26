@@ -25,15 +25,15 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-TABLES = ['stock']
+TABLES = ['stock','accounts']
 
 ### Update the Yellow DB tables
-for provider in providers:
-# for provider in ['upya']:
+# for provider in providers:
+for provider in ['upya']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         try:
             tablesync = TableInterface(provider,table)
             tablesync.syncdbtable()
