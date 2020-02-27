@@ -73,7 +73,7 @@ users,user_role,TEXT,role,role,,1,
 users,user_country,TEXT,,,,1,
 users,created_utc,TIMESTAMPTZ,created_utc,,,1,
 users,assigned_pricing_groups,TEXT,assigned_pricing_groups,,,1,
-users,stock,INT,,,,,
+users,stock,INT,stock,,,1,
 payments,payment_id,INT,,,,1,1
 payments,payment_external_id,TEXT,angaza_id,transactionId,1,1,
 payments,payment_status,TEXT,,status,,1,

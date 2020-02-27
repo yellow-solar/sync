@@ -28,12 +28,12 @@ core_tables = config(section='solarcore')
 TABLES = ['stock','accounts']
 
 ### Update the Yellow DB tables
-# for provider in providers:
-for provider in ['upya']:
+for provider in providers:
+# for provider in ['upya']:
     print('------')
     print(provider)
-    for table in TABLES:
-    # for table in providers[provider].get('tables',[]).keys():
+    # for table in TABLES:
+    for table in providers[provider].get('tables',[]).keys():
         try:
             tablesync = TableInterface(provider,table)
             tablesync.syncdbtable()
@@ -76,8 +76,8 @@ zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
-    # for zoho_table in zoho_cfg['sync_tables'].keys():
-    for zoho_table in ['applications']:
+    for zoho_table in zoho_cfg['sync_tables'].keys():
+    # for zoho_table in ['applications']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, provider, zoho)
