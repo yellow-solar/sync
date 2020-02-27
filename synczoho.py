@@ -110,14 +110,14 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['stock']:
+        for zoho_table in ['applications']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, provider, zoho)
     else:
         print("Can only update Zoho in prod")
 
     # Run the upload sync checker to look for new values
-    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","form":form,"command_string":"Upload_Sync_Checks"}) 
+    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","form":"NA","command_string":"Upload_Sync_Checks"}) 
     if check.status_code==200:
         print("Upload sync checked")
     else: 
