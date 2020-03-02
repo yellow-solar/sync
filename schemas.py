@@ -9,6 +9,7 @@ def create_schemas():
         "CREATE SCHEMA IF NOT EXISTS angaza;",
         "CREATE SCHEMA IF NOT EXISTS upya;",
         "CREATE SCHEMA IF NOT EXISTS upya_test;",
+        "CREATE SCHEMA IF NOT EXISTS upya_uganda;",
     ]
     pgdb = yellowpgdb()
     conn = pgdb.connect()
