@@ -7,6 +7,7 @@ import datetime
 # third party
 import pandas as pd
 import numpy as np
+import decimal
 
 # custom imports
 import tablesync
@@ -23,19 +24,30 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     update_on = 'ID' if update else None
     insert_or_update = "Updated" if update else "Inserted"
 
-    # Fetch DF
+    # Buil sql and cursor
     sql = tablesync.fetchCoreTableSQL(update=update)
     cur = tablesync.db_conn.cursor()
     cur.execute(sql)
-    # Process results
+    # Get results
     records = cur.fetchall()
     colnames = [desc[0] if desc[0]!="zoho_id" else "ID" for desc in cur.description]
+    
     # List of dicts which are zipped with field name
     record_dicts = [dict(zip(colnames, record)) for record in records]
-    
+
+    # Convert decimal records to string representation
+    for record_dict in record_dicts:
+        for key in record_dict.keys():
+            if isinstance(record_dict[key], decimal.Decimal):
+                record_dict[key] = "{0:0.{prec}f}".format(
+                    record_dict[key], 
+                    prec = decimal.Decimal(record_dict[key]).as_tuple().exponent*-1
+                )
+
     # Split data into slices for XML length restriction 
     dicts_slices = ([record_dicts[i:i + slice_length] 
                     for i in range(0, len(record_dicts), slice_length)])
+                    
     processed = 0
     # Upload/insert data slice
     for j in range (0,len(dicts_slices)):
