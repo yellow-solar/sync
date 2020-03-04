@@ -289,7 +289,7 @@ set unit_number = b.unit_number
 	, account_id = b.account_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
-	and a.external_sys = 'upya'
+	and (a.unit_number is null or b.unit_number is null)
 ;
 
 update core.payments a
@@ -300,15 +300,20 @@ where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
 ;
 
--- RESPONSIBLE USER
+-- responsible  - 2 parts update the responsible user id first, then add the usernames etc where empty
 update core.payments a
 set responsible_user_id = b.responsible_user_id
-	, responsible_user = b.responsible_user
-	, responsible_user_ext_id = b.responsible_user_external_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
 	and a.responsible_user_id is null
 	and a.effective_utc >= cast('2020-02-22' as timestamp) 
+;
+update core.payments a
+set responsible_user = b.username
+	, responsible_user_ext_id = case when a.external_sys = 'angaza' then b.user_angaza_id when a.external_sys = 'upya' then b.user_upya_id end
+from core.users b
+where a.responsible_user_id = b.user_id
+	and a.responsible_user is null
 ;
 
 -- COUNTRY
