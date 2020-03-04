@@ -292,6 +292,14 @@ where a.account_external_id = b.account_external_id
 	and a.external_sys = 'upya'
 ;
 
+update core.payments a
+set pricing_group = b.pricing_group
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and a.pricing_group is not null
+	and b.account_external_id is not null
+;
+
 -- RESPONSIBLE USER
 update core.payments a
 set responsible_user_id = b.responsible_user_id
