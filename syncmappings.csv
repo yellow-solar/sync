@@ -58,6 +58,8 @@ accounts,date_of_write_off_utc,TIMESTAMPTZ,date_of_write-off,writtenOff.date,,1,
 accounts,date_of_application_utc,TIMESTAMPTZ,,,,1,
 accounts,date_of_approval_utc,TIMESTAMPTZ,,approvalDate,,1,
 accounts,country,TEXT,country,country,,1,
+accounts,client_photo,TEXT,client_photo,,,1,
+accounts,contract_photo,TEXT,photo_of_contract,,,1,
 users,user_id,INT,,,,1,1
 users,user_angaza_id,TEXT,angaza_id,,,1,
 users,user_upya_id,TEXT,,agentNumber,,1,
