@@ -145,14 +145,16 @@ class ZohoAPI:
     def _pandas_xml_add(self, row):
         data_xml = ['<add>']
         for field in row.index:
-            data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(field, row[field]))
+            if row[field] is not None and row[field]!='':
+                data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(field, row[field]))
         data_xml.append('</add>')
         return("".join(data_xml))
 
     def _pandas_xml_list_add(self, row):
         data_xml = ['<add>']
         for index in row.keys():
-            data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(index, row[index]))
+            if row[index] is not None and row[index]!='':
+                data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(index, row[index]))
         data_xml.append('</add>')
         return("".join(data_xml))
         
@@ -161,8 +163,10 @@ class ZohoAPI:
         data_xml.append(f'<criteria>{update_id}=="{row[update_id]}"</criteria>')
         data_xml.append('<newvalues>')
         for field in row.index:
-            if field != update_id:
+            if row[field] is not None and row[field]!='' and field != update_id:
                 data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(field, row[field]))
+            elif row[index] is None:
+                data_xml.append('<field name="{0}"><value></value></field>'.format(index, row[index]))
         data_xml.append('</newvalues>')
         data_xml.append('</update>')
         return("".join(data_xml))
@@ -172,8 +176,10 @@ class ZohoAPI:
         data_xml.append(f'<criteria>{update_id}=="{row[update_id]}"</criteria>')
         data_xml.append('<newvalues>')
         for index in row.keys():
-            if index != update_id:
+            if row[index] is not None and row[index]!='' and index != update_id:
                 data_xml.append('<field name="{0}"><value>{1}</value></field>'.format(index, row[index]))
+            elif row[index] is None:
+                data_xml.append('<field name="{0}"><value></value></field>'.format(index, row[index]))
         data_xml.append('</newvalues>')
         data_xml.append('</update>')
         return("".join(data_xml))

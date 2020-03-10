@@ -106,7 +106,7 @@ def zohoSync(zoho_table, provider, zoho):
 if __name__ == "__main__":
     """
     when cron calls the zoho script, it must call with the form 
-    name input 
+    name input
     """
     providers = config(section='providers')
     zoho_tables = config(section='zoho')['sync_tables']  
