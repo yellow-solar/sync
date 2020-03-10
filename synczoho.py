@@ -134,6 +134,3 @@ if __name__ == "__main__":
         print("Upload sync checked")
     else: 
         print(check.text)
-    
-
-    
