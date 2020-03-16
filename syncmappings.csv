@@ -80,7 +80,7 @@ payments,payment_id,INT,,,,1,1
 payments,payment_external_id,TEXT,angaza_id,transactionId,1,1,
 payments,payment_status,TEXT,,status,,1,
 payments,payment_reference,TEXT,,paymentReference,,1,
-payments,country,TEXT,country,contract.country,,,
+payments,country,TEXT,country,contract.country,,1,
 payments,effective_utc,TIMESTAMPTZ,effective_utc,date,,1,
 payments,recorded_utc,TIMESTAMPTZ,recorded_utc,date,,1,
 payments,unit_number,TEXT,account_number,,,1,
