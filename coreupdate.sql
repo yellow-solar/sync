@@ -283,15 +283,22 @@ where a.holder_external_id = user_angaza_id
 ;
 
 ---- PAYMENTS -----
--- UNIT NUMBER, ACCOUNT ID 
+-- ACCOUNT ID 
 update core.payments a
-set unit_number = b.unit_number
-	, account_id = b.account_id
+set account_id = b.account_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
-	and (a.unit_number is null or b.unit_number is null)
 ;
 
+-- unit number
+update core.payments a
+set unit_number = b.unit_number
+from core.accounts b
+where a.account_external_id = b.account_external_id
+	and (a.unit_number is null and b.unit_number is not null)
+;
+
+-- pricing group
 update core.payments a
 set pricing_group = b.pricing_group
 from core.accounts b
