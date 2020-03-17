@@ -79,9 +79,15 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                     # print(f"Inserted {counter} of {len(ids)}")
                 tablesync.db_conn.commit()
                 print(f"Inserted {len(ids)} IDs to YDB")
-            except:
+            except Exception as e:
                 ### if it excepts then we need to delete the new inserts and IDs?
-                raise Exception("Failed to process response")
+                # raise Exception("Failed to process response")
+                # send an email notifying failure
+                gmail.quick_send(
+                    to = 'ben@yellow.africa, ross@yellow.africa',
+                    subject = f"Zoho sync error",
+                    text = f"See AWS log for details <br><br>{e}",
+                )  
 
 def zohoSync(zoho_table, provider, zoho):
     # 0. Prep
