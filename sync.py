@@ -45,11 +45,11 @@ for provider in providers:
             # print traceback
             traceback.print_exc()
             # send an email notifying failure
-            # gmail.quick_send(
-            #     to = 'ben@yellow.africa, ross@yellow.africa',
-            #     subject = f"DB sync event failed: {provider}.{table}",
-            #     text = f"See AWS log for details <br>{e}",
-            # )         
+            gmail.quick_send(
+                to = 'ben@yellow.africa, ross@yellow.africa',
+                subject = f"DB sync event failed: {provider}.{table}",
+                text = f"See AWS log for details <br>{e}",
+            )         
 
 ### Run the custom mapping
 print("--------------------------------------")
