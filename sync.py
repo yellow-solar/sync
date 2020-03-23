@@ -25,15 +25,15 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-TABLES = ['replacements']
+TABLES = ['users']
 
 ### Update the Yellow DB tables
-for provider in providers:
-# for provider in ['angaza']:
+# for provider in providers:
+for provider in ['upya_uganda']:
     print('------')
     print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
+    for table in TABLES:
+    # for table in providers[provider].get('tables',[]).keys():
         try:
             tablesync = TableInterface(provider,table)
             tablesync.syncdbtable()
@@ -45,11 +45,12 @@ for provider in providers:
             # print traceback
             traceback.print_exc()
             # send an email notifying failure
-            gmail.quick_send(
-                to = 'ben@yellow.africa, ross@yellow.africa',
-                subject = f"DB sync event failed: {provider}.{table}",
-                text = f"See AWS log for details <br>{e}",
-            )         
+            if provider != 'upya_uganda':
+                gmail.quick_send(
+                    to = 'ben@yellow.africa, ross@yellow.africa',
+                    subject = f"DB sync event failed: {provider}.{table}",
+                    text = f"See AWS log for details <br>{e}",
+                )         
 
 ### Run the custom mapping
 print("--------------------------------------")
@@ -78,8 +79,8 @@ PROVIDER = 'angaza'
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
-    for zoho_table in zoho_cfg['sync_tables'].keys():
-    # for zoho_table in ['replacements']:
+    # for zoho_table in zoho_cfg['sync_tables'].keys():
+    for zoho_table in ['users']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, PROVIDER, zoho)
