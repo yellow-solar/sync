@@ -19,8 +19,13 @@ from requests.auth import HTTPBasicAuth
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
-# customer
+from googleapi.gmail import Gmail
+
+# config 
 from config import config
+# email config
+gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
+
 
 class providerAPI:
     """ initalise provider API object to make snapshot, api updates etc. """
@@ -210,7 +215,8 @@ class ZohoAPI:
             # Have to make sure the slice length use keeps each xml under this limit then
             # WRITE AN IF TO CHECK IF XMLSTRING < 1,350,000 TO ENSURE IT WILL WORK
             # the relationship depends on # columns, # columns with values etc.
-            # The return value is a list, each value in the list is a JSON structured as {response:{status:<status_code>, text:<XMLresponse>}}
+            # The return value is a list, each value in the list is a JSON structured 
+            # as {response:{status:<status_code>, text:<XMLresponse>}}
         """
         # Send query to Zoho
         rpc_request = self.rpcAdd(xml)
@@ -225,14 +231,29 @@ class ZohoAPI:
                 for status in root.iter('status'):
                     if status.text != 'Success':
                         print("Failed with status: " + status.text)
+                        gmail.quick_send(
+                            to = 'ben@yellow.africa, ross@yellow.africa',
+                            subject = f"Zoho sync event entry failed",
+                            text = f"An entry was not successful in rpc response from Zoho. See AWS log for details <br>",
+                        )
                         raise Exception("An entry was not successful in rpc response from Zoho")
+
             else:
-                # print(rpc_request.text)
+                gmail.quick_send(
+                    to = 'ben@yellow.africa, ross@yellow.africa',
+                    subject = f"Zoho sync event entry failed",
+                    text = f"Received errorlist in rpc response from Zoho. See AWS log for details <br>",
+                )
                 raise Exception("Received errorlist in rpc response from Zoho")
 
         else:
             print(rpc_request.text)
             print(f"Error {rpc_request.status_code}: see rpc request text for more detail")
+            gmail.quick_send(
+                to = 'ben@yellow.africa, ross@yellow.africa',
+                subject = f"Zoho sync event entry failed",
+                text = f"Upload Request failed. See AWS log for details <br>",
+            )
             raise ValueError(f"Request failed with error code {rpc_request.status_code}")
         
         # If all is good, then process the IDs for return
