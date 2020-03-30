@@ -25,7 +25,7 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-TABLES = ['users']
+TABLES = ['payments']
 
 ## Update the Yellow DB tables
 for provider in providers:
@@ -45,12 +45,11 @@ for provider in providers:
             # print traceback
             traceback.print_exc()
             # send an email notifying failure
-            if provider != 'upya_uganda':
-                gmail.quick_send(
-                    to = 'ben@yellow.africa, ross@yellow.africa',
-                    subject = f"DB sync event failed: {provider}.{table}",
-                    text = f"See AWS log for details <br>{e}",
-                )         
+            gmail.quick_send(
+                to = 'ben@yellow.africa, ross@yellow.africa',
+                subject = f"DB sync event failed: {provider}.{table}",
+                text = f"See AWS log for details <br>{e}",
+            )         
 
 ### Run the custom mapping
 print("--------------------------------------")
