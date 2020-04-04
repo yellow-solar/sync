@@ -127,7 +127,9 @@ class TableInterface:
         # add new fields
         df['external_sys'] = self.provider
         df['organization'] = self.provider_cfg['organization']
-
+        if ('country' in self.zoho_map['yellow'].values):
+            df['country'] = self.provider_cfg['country']
+        
         # Re-create table header in case different
         print("Re-creating table header...")
         db_engine = self.db.get_engine()

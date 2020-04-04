@@ -25,7 +25,7 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-TABLES = ['payments']
+TABLES = ['stock']
 
 ## Update the Yellow DB tables
 for provider in providers:
