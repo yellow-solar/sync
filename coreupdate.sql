@@ -178,11 +178,12 @@ where a.recorder is null and
 
 -- Note/credit decision user
 update core.applications a
-set note_recorder = b.full_name
-	, note_recorder_id = b.user_id
-from core.users b
-where (a.note_recorder_external_id = b.user_angaza_id or a.note_recorder_external_id = b.user_upya_id)
-	and b.user_id is not null
+set note_recorder = b.webuser_fullname
+	, note_recorder_id = b.webuser_id
+from core.webusers b
+where (a.note_recorder_external_id = b.webuser_angaza_id or a.note_recorder_external_id = b.webuser_upya_id)
+	and b.webuser_id is not null
+	and a.note_recorder_id is null
 ;
 
 -- Responsible user ID
