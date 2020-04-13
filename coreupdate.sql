@@ -40,6 +40,12 @@ from core.applications b
 		and app_status.val = b.status
 where a.application_external_id = b.application_external_id
 ;
+-- account status in applications
+update core.applications a
+set account_status = null
+where external_sys = 'upya_uganda'
+	and account_external_id is null
+;
 
 -- MAP THE STOCK STATUSES 
 -- transit_state
@@ -85,7 +91,7 @@ set cumulative_days_disabled = case
 				greatest(days_since_registration - cumulative_activation_days,0)
 			else 0
 		end
-where external_sys in ('upya','upya_uganda')
+where external_sys = 'upya'
 ;
 
 -- UPDATE DAYS_TO_CUTOFF
@@ -146,7 +152,7 @@ update core.applications a
 set unit_number = b.unit_number
 from core.accounts b
 where a.account_external_id = b.account_external_id
-	and a.external_sys in ('upya','upya_uganda')
+	and a.external_sys = 'upya'
 	and a.status = 'DEPLOYED'
 ;
 
@@ -317,7 +323,7 @@ where a.account_external_id = b.account_external_id
 ;
 update core.payments a
 set responsible_user = b.username
-	, responsible_user_ext_id = case when a.external_sys = 'angaza' then b.user_angaza_id when a.external_sys in ('upya','upya_uganda') then b.user_upya_id end
+	, responsible_user_ext_id = case when a.external_sys = 'angaza' then b.user_angaza_id when a.external_sys = 'upya' then b.user_upya_id end
 from core.users b
 where a.responsible_user_id = b.user_id
 	and a.responsible_user is null
