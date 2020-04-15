@@ -263,6 +263,7 @@ class TableInterface:
                 select {cols}
                 from {self.core}.{self.table} a
                 where a.zoho_id {is_or_not} null
+                    and a.archived = false
                 order by {self.pk}
             """
         if update and self.update_sql is not None:  
