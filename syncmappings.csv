@@ -5,7 +5,7 @@ all,country,TEXT,country,country,country,,1,
 all,zoho_id,BIGINT,,,,,1,
 accounts,account_id,INT,,,,,1,1
 accounts,account_external_id,TEXT,angaza_id,contractNumber,contractNumber,1,1,
-accounts,unit_number,TEXT,account_number,asset.paygNumber,asset.paygNumber,,1,
+accounts,unit_number,TEXT,account_number,paygNumber,paygNumber,,1,
 accounts,asset_number,TEXT,account_number,unitSerialNumber,unitSerialNumber,,1,
 accounts,previous_asset_number,TEXT,previous_account_number,prevUnitSerialNumber,prevUnitSerialNumber,,1,
 accounts,linked_account_external_id,TEXT,,linkedTo.contractNumber,linkedTo.contractNumber,,1,

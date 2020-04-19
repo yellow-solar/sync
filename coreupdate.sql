@@ -263,6 +263,16 @@ where a.responsible_user_external_id = b.user_angaza_id
 	or a.responsible_user_external_id = b.user_upya_id
 ;
 
+-- Responsible user name
+update core.accounts a
+set responsible_user = b.full_name
+from core.users b
+where a.responsible_user is null and
+	(a.responsible_user_external_id = b.user_angaza_id
+	or a.responsible_user_external_id = b.user_upya_id)
+;
+
+
 ---- STOCK -----
 -- Account ID
 -- input if there is a deployed account
@@ -317,6 +327,7 @@ where a.account_external_id = b.account_external_id
 -- responsible  - 2 parts update the responsible user id first, then add the usernames etc where empty
 update core.payments a
 set responsible_user_id = b.responsible_user_id
+	, responsible_user_ext_id = b.responsible_user_external_id
 from core.accounts b
 where a.account_external_id = b.account_external_id
 	and a.responsible_user_id is null
