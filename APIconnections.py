@@ -48,11 +48,15 @@ class providerAPI:
         if (self.headers is None):
             snapshot = requests.get(
                 f"{self.snapshoturl}/{tableurl}", 
-                auth=HTTPBasicAuth(self.user, self.pswrd))
+                auth=HTTPBasicAuth(self.user, self.pswrd),
+                timeout = 10,
+                )
         else:
             snapshot = requests.get(
                 url, 
-                headers = self.headers)
+                headers = self.headers,
+                timeout = 10,
+                )
         # If successful then return the string
         if snapshot.status_code == 200:
             file_ = snapshot.content.decode('utf-8')
@@ -96,7 +100,7 @@ class ZohoAPI:
     def get(self, form, payload={}):
         url = self.baseUrl + '/' + self.format_type + '/' + self.application_name + '/' + 'view/' + form
         parameters = {**self.RPCheader,**payload}
-        r = requests.get(url, params = parameters)
+        r = requests.get(url, params = parameters, timeout = 10)
         return(r)
 
     #  function to add single row
