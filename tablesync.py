@@ -177,7 +177,6 @@ class TableInterface:
             select = f"{col} = ST_GeographyFromText('POINT('||b.{col}||')')"
         return(select)
 
-    
     def _insertTableStatement(self, filter_insert = None):
         # create the cast statements
         self.map_df_sys['select'] = (
