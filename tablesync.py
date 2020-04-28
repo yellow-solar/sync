@@ -120,6 +120,7 @@ class TableInterface:
                     .loc[self.map_df['type']=='GEOGRAPHY',self.org]
         )
         for col in geo_cols:
+            df[col] = df[col].replace("- -",np.NaN)
             df[col] = df[col].apply(
                 lambda x: " ".join(x.split(',')[::-1]) if x is not np.NaN else x
             )
@@ -170,11 +171,11 @@ class TableInterface:
     def _createUpdate(self, row):
         dtype = row['type']
         col = row[self.org]
-        select = f"{col} = b.{col}"
+        select = f"{col} = a.{col}"
         if (dtype not in ('TEXT','GEOGRAPHY')):  
-            select = f"{col} = cast(b.{col} as {dtype})"
+            select = f"{col} = cast(a.{col} as {dtype})"
         elif (dtype == 'GEOGRAPHY'):
-            select = f"{col} = ST_GeographyFromText('POINT('||b.{col}||')')"
+            select = f"{col} = ST_GeographyFromText('POINT('||a.{col}||')')"
         return(select)
 
     def _insertTableStatement(self, filter_insert = None):
@@ -204,10 +205,10 @@ class TableInterface:
         return(insert_sql)
 
     # 2. update 
-    def _updateTableStatement(self):
+    def _updateTableStatement(self, filter_update):
         """ create an update statement to sync tables """
         # update header
-        update = f"UPDATE {self.core}.{self.table} a"
+        update = f"UPDATE {self.core}.{self.table} c"
         # create casts
         self.map_df_sys['update'] = (
             self.map_df_sys.apply(self._createUpdate, axis = 1)
@@ -216,8 +217,12 @@ class TableInterface:
             self.map_df_sys['update'].values.tolist()+
             ["change_timestamp = CURRENT_TIMESTAMP"])  # need to set change timestamp
         # set statements for each col
-        sets = f"SET {casts} FROM {self.provider}.{self.table} b"
-        where = f"WHERE a.{self.update_on} = b.{self.update_on}"
+        sets = f"SET {casts} FROM {self.provider}.{self.table} a"
+        where = f"WHERE c.{self.update_on} = a.{self.update_on}"
+        
+        if filter_update is not None:
+            where = where + " and " + filter_update
+        
         update_sql = "\n".join([update, sets, where])
         return(update_sql)
 
@@ -236,7 +241,7 @@ class TableInterface:
         self.execute(insert_sql)
         # 2. update all the rest
         print("Creating update statement...")
-        update_sql = self._updateTableStatement()
+        update_sql = self._updateTableStatement(self.table_cfg.get('filter',None))
         print("Executing update statement...")
         self.execute(update_sql)
         print("Internal Sync Complete.")
