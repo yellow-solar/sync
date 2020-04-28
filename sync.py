@@ -25,11 +25,11 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 providers = config(section='providers')
 core_tables = config(section='solarcore')
 
-# TABLES = ['payments','accounts','stock','applications','clients']
-TABLES = ['clients']
+TABLES = ['payments','accounts','stock','clients','users','webusers']
+# TABLES = ['applications']
 ## Update the Yellow DB tables
-# for provider in providers:
-for provider in ['upya']:
+for provider in providers:
+# for provider in ['upya']:
     print('------')
     print(provider)
     for table in TABLES:
@@ -52,46 +52,46 @@ for provider in ['upya']:
             # )         
 
 ### Run the custom mapping
-# print("--------------------------------------")
-# print("Running the core update sql script....")
-# db = yellowpgdb()
-# conn = db.connect()
-# with conn.cursor() as cursor:
-#     cursor.execute(open("coreupdate.sql", "r").read())
-#     # update replacements if prod
-#     if config('env') == 'prod':
-#         cursor.execute(open("replacements.sql", "r").read())
+print("--------------------------------------")
+print("Running the core update sql script....")
+db = yellowpgdb()
+conn = db.connect()
+with conn.cursor() as cursor:
+    cursor.execute(open("coreupdate.sql", "r").read())
+    # update replacements if prod
+    if config('env') == 'prod':
+        cursor.execute(open("replacements.sql", "r").read())
 
-# # commit and close
-# conn.commit()
-# conn.close()
-# print("Successfully updated core tables.")
-# print("--------------------------------------")
+# commit and close
+conn.commit()
+conn.close()
+print("Successfully updated core tables.")
+print("--------------------------------------")
 
 ### update zoho
-# # Fetch zoho cfg and setup API connection object
-# zoho_cfg = config(section='zoho')
-# zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
+# Fetch zoho cfg and setup API connection object
+zoho_cfg = config(section='zoho')
+zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
-# PROVIDER = 'angaza'
+PROVIDER = 'angaza'
 
-# # loop through each table configured for zoho release
-# env = config('env')
-# if env == 'prod':            
-#     for zoho_table in zoho_cfg['sync_tables'].keys():
-#     # for zoho_table in ['payments']:
-#         print("--------------------------------------")
-#         print(f"Zoho Import Sync: {zoho_table}")
-#         zohoSync(zoho_table, PROVIDER, zoho)
+# loop through each table configured for zoho release
+env = config('env')
+if env == 'prod':            
+    # for zoho_table in zoho_cfg['sync_tables'].keys():
+    for zoho_table in ['payments','accounts','stock','clients','users','webusers']:
+        print("--------------------------------------")
+        print(f"Zoho Import Sync: {zoho_table}")
+        zohoSync(zoho_table, PROVIDER, zoho)
 
-#     # Run the upload sync checker to look for new values
-#     check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":"Upload_Sync_Checks"}) 
-#     if check.status_code==200:
-#         print("Upload sync checked")
-#     else: 
-#         print(check.text)
-# else:
-#     print("Can only update Zoho in prod")
+    # Run the upload sync checker to look for new values
+    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":"Upload_Sync_Checks"}) 
+    if check.status_code==200:
+        print("Upload sync checked")
+    else: 
+        print(check.text)
+else:
+    print("Can only update Zoho in prod")
 
-# print("--------------------------------------")
-# print("Completed Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+print("--------------------------------------")
+print("Completed Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
