@@ -66,6 +66,8 @@ where a.asset_number = b.asset_number
 update core.accounts a
 set hour_price = a.recurring_amount/a.days_per_recurring_amount/ 24
 where a.days_per_recurring_amount is not null
+	and a.days_per_recurring_amount!= 0
+	and a.hour_price is null
 ;
 
 -- UPDATE THE DAYS SINCE REGISTRATION
@@ -377,8 +379,9 @@ INSERT INTO core.products (product, product_external_name)
 		
 INSERT INTO core.pricing_groups(
 	product, pricing_group)
-	select distinct product, pricing_group from upya.accounts
+	select distinct product, pricing_group from angaza.accounts
 	where pricing_group is not null
 		and pricing_group not in (select pricing_group from core.pricing_groups)
-		;
+;
+
 
