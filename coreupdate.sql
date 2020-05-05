@@ -127,7 +127,7 @@ where a.user_upya_id is not null and a.user_angaza_id is not null
 
 -- UPDATE THE CLIENT NEXT OF KIN TO EXCLUDE TEXT
 update core.clients a
-set next_of_kin_contact_number = regexp_replace(next_of_kin_contact_number, '\D', '', 'g')
+set next_of_kin_contact_number = nullif(coalesce(regexp_replace(next_of_kin_contact_number, '\D', '', 'g'),'0'),'')
 where next_of_kin_contact_number similar to '%\D%'
 ;
 
