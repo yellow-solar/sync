@@ -127,8 +127,8 @@ if __name__ == "__main__":
     # loop through each table in zoho
     env = config('env')
     if env == 'prod':            
-        for zoho_table in zoho_tables:
-        # for zoho_table in ['applications']:
+        # for zoho_table in zoho_tables:
+        for zoho_table in ['clients']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, provider, zoho)
     else:
