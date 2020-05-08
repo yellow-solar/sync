@@ -390,7 +390,7 @@ INSERT INTO core.products (product, product_external_name)
 		
 INSERT INTO core.pricing_groups(
 	product, pricing_group)
-	select distinct product, pricing_group from angaza.accounts
+	select distinct product, pricing_group from upya.accounts
 	where pricing_group is not null
 		and pricing_group not in (select pricing_group from core.pricing_groups)
 ;
