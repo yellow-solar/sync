@@ -8,7 +8,7 @@ insert into core.replacements (replacement_external_id, external_sys, product,ac
 select 'R'||a.previous_unit_number as replacement_external_id
 	, a.external_sys
 	, a.product
-	, a.account_ids
+	, a.account_id
 	, old_s.stock_id as old_stock_id
 	, old_s.unit_number as old_unit_number
 	, old_s.asset_number as old_asset_number

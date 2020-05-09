@@ -26,31 +26,31 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-TABLES = ['applications']
+TABLES = ['accounts']
 
 ## Update the Yellow DB tables
-for provider in providers:
+# for provider in providers:
 # for provider in ['upya']:
-    print('------')
-    print(provider)
-    # for table in TABLES:
-    for table in providers[provider].get('tables',[]).keys():
-        try:
-            tablesync = TableInterface(provider,table)
-            tablesync.syncdbtable()
-        except Exception as e: 
-            # show failure
-            print(f"{provider} {table} download and DB sync failed.")
-            print(e)
-            print('-------------------------------------------------')
-            # print traceback
-            traceback.print_exc()
-            # send an email notifying failure
-            gmail.quick_send(
-                to = 'ben@yellow.africa, ross@yellow.africa',
-                subject = f"DB sync event failed: {provider}.{table}",
-                text = f"See AWS log for details <br>{e}",
-            )         
+#     print('------')
+#     print(provider)
+#     for table in TABLES:
+#     # for table in providers[provider].get('tables',[]).keys():
+#         try:
+#             tablesync = TableInterface(provider,table)
+#             tablesync.syncdbtable()
+#         except Exception as e: 
+#             # show failure
+#             print(f"{provider} {table} download and DB sync failed.")
+#             print(e)
+#             print('-------------------------------------------------')
+#             # print traceback
+#             traceback.print_exc()
+#             # send an email notifying failure
+#             gmail.quick_send(
+#                 to = 'ben@yellow.africa, ross@yellow.africa',
+#                 subject = f"DB sync event failed: {provider}.{table}",
+#                 text = f"See AWS log for details <br>{e}",
+#             )         
 
 ### Run the custom mapping
 print("--------------------------------------")
@@ -58,11 +58,24 @@ print("Running the core update sql script....")
 db = yellowpgdb()
 conn = db.connect()
 with conn.cursor() as cursor:
-    cursor.execute(open("coreupdate.sql", "r").read())
-    # update replacements if prod
-    if config('env') == 'prod':
-        cursor.execute(open("replacements.sql", "r").read())
-
+    try:
+        cursor.execute(open("coreupdate.sql", "r").read())
+        # update replacements if prod
+        if config('env') == 'prod':
+            cursor.execute(open("replacements.sql", "r").read())
+    except Exception as e:
+        # show failure
+        print(f"SQL Sync Failed")
+        print(e)
+        print('-------------------------------------------------')
+        # print traceback
+        traceback.print_exc()
+        gmail.quick_send(
+            to = 'ben@yellow.africa, ross@yellow.africa',
+            subject = f"SQL Yellow DB script failed",
+            text = f"See AWS log for details <br> {e}",
+        ) 
+            
 # commit and close
 conn.commit()
 conn.close()
@@ -79,8 +92,8 @@ PROVIDER = 'angaza'
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
-    for zoho_table in zoho_cfg['sync_tables'].keys():
-    # for zoho_table in ['applications']:
+    # for zoho_table in zoho_cfg['sync_tables'].keys():
+    for zoho_table in ['payments']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, PROVIDER, zoho)
