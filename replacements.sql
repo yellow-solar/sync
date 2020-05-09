@@ -5,10 +5,10 @@
 -- Replacements table made from upya data
 insert into core.replacements (replacement_external_id, external_sys, product,account_id,old_stock_id,old_unit_number,old_asset_number,new_stock_id,new_unit_number,new_asset_number,
 							  replacement_date_utc,source_of_replacement,acc_responsible_user,acc_responsible_user_id,acc_responsible_user_ext_id)
-select 'R'||a.previous_asset_number||'-'||a.account_external_id as replacement_external_id
+select 'R'||a.previous_unit_number as replacement_external_id
 	, a.external_sys
 	, a.product
-	, a.account_id
+	, a.account_ids
 	, old_s.stock_id as old_stock_id
 	, old_s.unit_number as old_unit_number
 	, old_s.asset_number as old_asset_number
@@ -22,12 +22,14 @@ select 'R'||a.previous_asset_number||'-'||a.account_external_id as replacement_e
 	, a.responsible_user_external_id acc_responsible_user_ext_id
 
 from core.accounts a
-join core.stock new_s
-	on new_s.asset_number = a.asset_number
-left join core.stock old_s
-	on old_s.asset_number = a.previous_asset_number
+-- join core.stock new_s
+-- 	on new_s.unit_number = a.unit_number
+join core.stock old_s
+	on old_s.unit_number = a.previous_unit_number
 where a.date_of_replacement_utc is not null
-	and 'R'||a.previous_asset_number||'-'||a.account_external_id not in (select replacement_external_id from core.replacements)
+	and 'R'||a.previous_unit_number not in (select replacement_external_id from core.replacements)
+	and a.previous_unit_number is not null
+	and old_s.archived = false
 limit 100
 ;
 
