@@ -30,7 +30,7 @@ class TableInterface:
     def __init__(self, provider, table, core = 'core', org = 'yellow'):
         self.provider = provider
         self.provider_cfg = config(section = "providers")[provider]
-        self.table_cfg = self.provider_cfg['tables'][table]
+        self.table_cfg = self.provider_cfg['tables'].get(table,"")
         self.table = table
         self.org = org
         self.core = core

@@ -26,7 +26,7 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-TABLES = ['accounts']
+# TABLES = ['applications']
 
 ## Update the Yellow DB tables
 for provider in providers:
@@ -87,8 +87,6 @@ print("--------------------------------------")
 zoho_cfg = config(section='zoho')
 zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 
-PROVIDER = 'angaza'
-
 # loop through each table configured for zoho release
 env = config('env')
 if env == 'prod':            
@@ -96,7 +94,7 @@ if env == 'prod':
     # for zoho_table in ['payments']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
-        zohoSync(zoho_table, PROVIDER, zoho)
+        zohoSync(zoho_table, zoho)
 
     # Run the upload sync checker to look for new values
     check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":"Upload_Sync_Checks"}) 

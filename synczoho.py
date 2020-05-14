@@ -89,7 +89,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                     text = f"See AWS log for details <br><br>{e}",
                 )  
 
-def zohoSync(zoho_table, provider, zoho):
+def zohoSync(zoho_table, zoho):
     # 0. Prep
     # zoho syc config
     zohosync_cfg = config(section='zoho')['sync_tables'][zoho_table]
@@ -99,7 +99,7 @@ def zohoSync(zoho_table, provider, zoho):
     # update_ydb = zohosync_cfg.get('update_ydb',dbupdate)
 
     # YDB table config
-    tablesync = TableInterface(provider,table)
+    tablesync = TableInterface('upya',table)
     tablesync.connect()
 
     # 2. Update Zoho <> YDB
@@ -117,9 +117,6 @@ if __name__ == "__main__":
     providers = config(section='providers')
     zoho_tables = config(section='zoho')['sync_tables']  
 
-    # Set any provider -> irrelevent for this update
-    provider = 'angaza'
-
     # Fetch zoho cfg and setup API connection object
     zoho_cfg = config(section='zoho')
     zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
@@ -128,9 +125,9 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['clients']:
+        for zoho_table in ['users']:
             print(f"Zoho Import Sync: {zoho_table}")
-            zohoSync(zoho_table, provider, zoho)
+            zohoSync(zoho_table, zoho)
     else:
         print("Can only update Zoho in prod")
 
