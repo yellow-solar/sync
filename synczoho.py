@@ -15,6 +15,9 @@ from tablesync import TableInterface
 from yellowpgdb import yellowpgdb
 from config import config
 from APIconnections import ZohoAPI
+from googleapi.gmail import Gmail
+
+gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 
 def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     """ YDB <> Zoho insert or update using Pandas DF"""
