@@ -99,7 +99,7 @@ def zohoSync(zoho_table, zoho):
     # update_ydb = zohosync_cfg.get('update_ydb',dbupdate)
 
     # YDB table config
-    tablesync = TableInterface('upya',table)
+    tablesync = TableInterface(None,table)
     tablesync.connect()
 
     # 2. Update Zoho <> YDB
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['users']:
+        for zoho_table in ['replacements']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, zoho)
     else:
