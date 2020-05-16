@@ -37,19 +37,20 @@ class TableInterface:
         self.zoho_map = headerMap(self.table, self.provider, sys=True, zoho = True)
         self.pk = (self.core_map
                     .loc[self.core_map['pk']==1,self.org].iloc[0])
+        self.update_on = (self.core_map
+                            .loc[self.core_map['update_on']==1,self.org].iloc[0])
+        # Database stuff
         self.db = yellowpgdb()
         self.core_cfg = config('solarcore').get(self.table, None)
         self.update_sql = self.core_cfg.get('update_query',None)
         self.connect()
-        
         # For provider data
         if self.provider is not None:
             self.provider_cfg = config(section = "providers")[provider]
             self.table_cfg = self.provider_cfg['tables'].get(table,"")
             self.map_df = headerMap(self.table, self.provider, sys=False)
             self.map_df_sys = headerMap(self.table, self.provider, sys=True)
-            self.update_on = (self.map_df
-                            .loc[self.map_df['update_on']==1,self.org].iloc[0])
+            
             
     def fetchAndUploadProviderData(self):
         """  Function to sync a specifc table from specific provider 
