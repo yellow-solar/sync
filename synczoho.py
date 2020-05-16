@@ -94,6 +94,8 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
 
 def zohoSync(zoho_table, zoho):
     # 0. Prep
+    print("-----------------------------------------------------")
+    print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # zoho syc config
     zohosync_cfg = config(section='zoho')['sync_tables'][zoho_table]
     table = zohosync_cfg['table']
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['replacements']:
+        for zoho_table in ['payments']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, zoho)
     else:
