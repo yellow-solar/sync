@@ -2,7 +2,7 @@
 
 # syslibrary
 import os,sys
-import datetime 
+from datetime import datetime 
 
 # third party
 import pandas as pd
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['payments']:
+        for zoho_table in ['applications']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, zoho)
     else:
