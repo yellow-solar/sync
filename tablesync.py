@@ -79,6 +79,7 @@ class TableInterface:
                             dtype = str,
                             na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&\+]','',regex=True) 
+                .replace('[(^\")(\"$)]','',regex=True) 
             )
         
         # concatenate columns with + in them
