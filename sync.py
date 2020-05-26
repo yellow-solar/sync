@@ -40,6 +40,9 @@ with conn.cursor() as cursor:
     except Exception as e: 
          print(f"Core prep SQL failed:")
          print(e)
+# commit and close
+conn.commit()
+conn.close()
 
 ## Update the Yellow DB tables
 for provider in providers:
