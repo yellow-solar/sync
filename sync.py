@@ -26,11 +26,24 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-# TABLES = ['applications']
+# TABLES = ['accounts']
+
+# Run the core preparation scripts
+### Run the custom mapping
+print("--------------------------------------")
+print("Running the core prep sql script....")
+db = yellowpgdb()
+conn = db.connect()
+with conn.cursor() as cursor:
+    try:
+        cursor.execute(open("coreprep.sql", "r").read())
+    except Exception as e: 
+         print(f"Core prep SQL failed:")
+         print(e)
 
 ## Update the Yellow DB tables
 for provider in providers:
-# for provider in ['upya']:
+# for provider in ['angaza']:
     print('------')
     print(provider)
     # for table in TABLES:
@@ -91,7 +104,7 @@ zoho = ZohoAPI(zoho_cfg['zc_ownername'], zoho_cfg['authtoken'], zoho_cfg['app'])
 env = config('env')
 if env == 'prod':            
     for zoho_table in zoho_cfg['sync_tables'].keys():
-    # for zoho_table in ['payments']:
+    # for zoho_table in ['applications']:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
         zohoSync(zoho_table, zoho)
