@@ -26,27 +26,11 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-# TABLES = ['accounts']
-
-# Run the core preparation scripts
-### Run the custom mapping
-print("--------------------------------------")
-print("Running the core prep sql script....")
-db = yellowpgdb()
-conn = db.connect()
-with conn.cursor() as cursor:
-    try:
-        cursor.execute(open("coreprep.sql", "r").read())
-    except Exception as e: 
-         print(f"Core prep SQL failed:")
-         print(e)
-# commit and close
-conn.commit()
-conn.close()
+TABLES = ['users']
 
 ## Update the Yellow DB tables
 for provider in providers:
-# for provider in ['angaza']:
+# for provider in ['upya']:
     print('------')
     print(provider)
     # for table in TABLES:

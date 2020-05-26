@@ -280,6 +280,11 @@ class TableInterface:
             sql = self.update_sql['sql'].format(cols)
         return(sql)
 
+    def corePrepSQL(self):
+        if self.table_cfg.get('core_prep',False):
+            print("Running core updates before internal sync")
+            self.execute(open("coreprep.sql", "r").read())
+
     def _getStagingColNames(self):
         curs = self.db_conn.cursor()
         tablepath = self.provider + "." + self.table
@@ -302,8 +307,8 @@ class TableInterface:
 
     def syncdbtable(self):
         self.fetchAndUploadProviderData()
+        self.corePrepSQL()
         self.internalSync()
-
 
 if __name__ == "__main__":
     sync = TableInterface('angaza','payments')
