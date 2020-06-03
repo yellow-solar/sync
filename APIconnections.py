@@ -236,7 +236,7 @@ class ZohoAPI:
                     if status.text != 'Success':
                         print("Failed with status: " + status.text)
                         gmail.quick_send(
-                            to = 'ben@yellow.africa, ross@yellow.africa',
+                            to = 'devops@yellow.africa',
                             subject = f"Zoho sync event entry failed",
                             text = f"An entry was not successful in rpc response from Zoho. See AWS log for details <br>",
                         )
@@ -244,7 +244,7 @@ class ZohoAPI:
 
             else:
                 gmail.quick_send(
-                    to = 'ben@yellow.africa, ross@yellow.africa',
+                    to = 'devops@yellow.africa',
                     subject = f"Zoho sync event entry failed",
                     text = f"Received errorlist in rpc response from Zoho. See AWS log for details <br>",
                 )
@@ -254,7 +254,7 @@ class ZohoAPI:
             print(rpc_request.text)
             print(f"Error {rpc_request.status_code}: see rpc request text for more detail")
             gmail.quick_send(
-                to = 'ben@yellow.africa, ross@yellow.africa',
+                to = 'devops@yellow.africa',
                 subject = f"Zoho sync event entry failed",
                 text = f"Upload Request failed. See AWS log for details <br>",
             )

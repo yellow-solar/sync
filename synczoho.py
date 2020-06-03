@@ -87,7 +87,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 # raise Exception("Failed to process response")
                 # send an email notifying failure
                 gmail.quick_send(
-                    to = 'ben@yellow.africa, ross@yellow.africa',
+                    to = 'devops@yellow.africa',
                     subject = f"Zoho sync error",
                     text = f"See AWS log for details <br><br>{e}",
                 )  

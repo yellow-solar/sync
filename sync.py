@@ -26,7 +26,7 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-TABLES = ['users']
+TABLES = ['clients']
 
 ## Update the Yellow DB tables
 for provider in providers:
@@ -47,7 +47,7 @@ for provider in providers:
             traceback.print_exc()
             # send an email notifying failure
             gmail.quick_send(
-                to = 'ben@yellow.africa, ross@yellow.africa',
+                to = 'devops@yellow.africa',
                 subject = f"DB sync event failed: {provider}.{table}",
                 text = f"See AWS log for details <br>{e}",
             )         
@@ -71,7 +71,7 @@ with conn.cursor() as cursor:
         # print traceback
         traceback.print_exc()
         gmail.quick_send(
-            to = 'ben@yellow.africa, ross@yellow.africa',
+            to = 'devops@yellow.africa',
             subject = f"SQL Yellow DB script failed",
             text = f"See AWS log for details <br> {e}",
         ) 
