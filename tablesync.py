@@ -284,6 +284,10 @@ class TableInterface:
         if self.table_cfg.get('core_prep',False):
             print("Running core updates before internal sync")
             self.execute(open("coreprep.sql", "r").read())
+        elif self.table_cfg.get('users_prep',False):
+            print("Running users updates before internal sync")
+            self.execute(open("usersprep.sql", "r").read())
+                
 
     def _getStagingColNames(self):
         curs = self.db_conn.cursor()
