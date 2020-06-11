@@ -119,7 +119,7 @@ class TableInterface:
                 data = self.table_cfg['body']
             else:
                 data=None
-            snapshot = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
+            file_ = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
             self._convertFileStringAppendToDF(file_)
 
     def _convertFileStringAppendToDF(self, file_):
