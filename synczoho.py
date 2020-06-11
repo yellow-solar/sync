@@ -109,7 +109,8 @@ def zohoSync(zoho_table, zoho):
 
     # 2. Update Zoho <> YDB
     # Update the old records to Zoho - update first because inserts don't need to be
-    insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
+    if zohosync_cfg.get("update",True):
+        insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
 
     # Insert the new records to Zoho
     insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=False, slice_length = slice_length)
@@ -130,7 +131,7 @@ if __name__ == "__main__":
     env = config('env')
     if env == 'prod':            
         # for zoho_table in zoho_tables:
-        for zoho_table in ['applications']:
+        for zoho_table in ['stock_events']:
             print(f"Zoho Import Sync: {zoho_table}")
             zohoSync(zoho_table, zoho)
     else:

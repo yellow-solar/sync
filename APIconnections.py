@@ -41,22 +41,44 @@ class providerAPI:
         self.sep = cfg.get('sep',",")
         self.tables = cfg['tables']
 
-    def pullSnapshot(self, tableurl):
+    def pullSnapshot(self, tableurl, get = True, post = False, data = None):
         """ Download table from snapshot URL and correct for bad characters """
         # crete url based on tablename
         url = self.snapshoturl+"/"+tableurl
-        if (self.headers is None):
-            snapshot = requests.get(
-                f"{self.snapshoturl}/{tableurl}", 
-                auth=HTTPBasicAuth(self.user, self.pswrd),
-                timeout = 45,
-                )
-        else:
-            snapshot = requests.get(
-                url, 
-                headers = self.headers,
-                timeout = 45,
-                )
+
+        # if get request
+        if get:
+            if (self.headers is None):
+                snapshot = requests.get(
+                    f"{self.snapshoturl}/{tableurl}", 
+                    auth=HTTPBasicAuth(self.user, self.pswrd),
+                    timeout = 45,
+                    data = data,
+                    )       
+            else:
+                snapshot = requests.get(
+                    url, 
+                    headers = self.headers,
+                    timeout = 45,
+                    data = data,
+                    )
+        # else if post
+        elif post:
+            if (self.headers is None):
+                snapshot = requests.post(
+                    f"{self.snapshoturl}/{tableurl}", 
+                    auth=HTTPBasicAuth(self.user, self.pswrd),
+                    timeout = 45,
+                    data = data,
+                    )       
+            else:
+                snapshot = requests.post(
+                    url, 
+                    headers = self.headers,
+                    timeout = 45,
+                    data = data,
+                    )
+    
         # If successful then return the string
         if snapshot.status_code == 200:
             file_ = snapshot.content.decode('utf-8')

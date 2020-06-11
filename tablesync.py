@@ -44,14 +44,15 @@ class TableInterface:
         self.core_cfg = config('solarcore').get(self.table, None)
         self.update_sql = self.core_cfg.get('update_query',None)
         self.connect()
+        # Dataframe
+        self.df = pd.DataFrame()
         # For provider data
         if self.provider is not None:
             self.provider_cfg = config(section = "providers")[provider]
             self.table_cfg = self.provider_cfg['tables'].get(table,"")
             self.map_df = headerMap(self.table, self.provider, sys=False)
             self.map_df_sys = headerMap(self.table, self.provider, sys=True)
-            
-            
+
     def fetchAndUploadProviderData(self):
         """  Function to sync a specifc table from specific provider 
                 table       : name of core table (mapped from config for table name)
@@ -62,84 +63,15 @@ class TableInterface:
 
         print("-----------------------------------------------------")
         print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+           
+        # Fetch Data
+        self._fetchAndConvertProviderData()
+        self._processProviderData()
 
-        # sync config
-        sync_cfg = config(section='providers')[self.provider]
-
-        # provider connection and snapshots
-        print(f"Fetching {self.provider} {self.table} file...")
-        apiconn = providerAPI(self.provider)
-        snapshot = apiconn.pullSnapshot(self.table_cfg['url'])
-
-        # process file
-        print("Processing file...")
-        instream = StringIO(snapshot)
-        df = (pd.read_csv(instream,
-                            sep = sync_cfg.get("sep",','), 
-                            dtype = str,
-                            na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
-                .replace('[\\t\\r\\n<>&\+]','',regex=True) 
-                .replace('[(^\")(\"$)]','',regex=True) 
-            )
-        
-        # concatenate columns with + in them
-        to_concat = self.map_df[self.provider].str.contains("+",regex=False)
-        for index in self.map_df[to_concat].index:
-            concat_col_name = self.map_df.loc[index, self.provider]
-            df[concat_col_name] = ""
-            concat_cols = self.map_df.loc[index, self.provider].split("+")
-            for col in concat_cols:
-                df[concat_col_name] = (
-                    df[concat_col_name]
-                        .str.cat(df[col], sep = " ")
-                        .str.lstrip()
-                ) 
-
-        # concatenate columns with | in them
-        to_concat = self.map_df[self.provider].str.contains("|",regex=False)
-        for index in self.map_df[to_concat].index:
-            concat_col_name = self.map_df.loc[index, self.provider]
-            df[concat_col_name] = ""
-            concat_cols = self.map_df.loc[index, self.provider].split("|")
-            for col in concat_cols:
-                df[concat_col_name] = (
-                    df[concat_col_name]
-                        .str.cat(df[col], sep = "")
-                        .str.lstrip()
-                ) 
-
-        
-
-        # get the mapped columns that are actually in the df
-        mapped_cols_in_df = [x for x in self.map_df[self.provider].values.tolist() if x in df.columns]
-        # filter table for cols that are mapped
-        df = df[mapped_cols_in_df]
-        # get the target colnames that exist
-        renamed_cols_in_df = self.map_df.loc[self.map_df[self.provider].isin(mapped_cols_in_df), self.org].values.tolist()
-        # rename for re entry to DB 
-        df.columns = renamed_cols_in_df
-        # drop any blank rows
-        df = df.dropna(axis = 1, how = 'all')
-
-        # Process location from lat long to long lat (for PostGIS)
-        geo_cols = (self.map_df
-                    .loc[self.map_df['type']=='GEOGRAPHY',self.org]
-        )
-        for col in geo_cols:
-            df[col] = df[col].replace("- -",np.NaN)
-            df[col] = df[col].apply(
-                lambda x: " ".join(x.split(',')[::-1]) if x is not np.NaN else x
-            )
-
-        # add new fields
-        df['external_sys'] = self.provider
-        df['organization'] = self.provider_cfg['organization']
-        df['country'] = self.provider_cfg['country']
-            
         # Re-create table header in case different
         print("Re-creating table header...")
         db_engine = self.db.get_engine()
-        df.head(0).to_sql(
+        self.df.head(0).to_sql(
             self.table, 
             db_engine,
             schema = self.provider, 
@@ -150,7 +82,7 @@ class TableInterface:
         # Create stringIO stream, and set cursore to start
         outstream = StringIO()
         # replace null and stream out
-        df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
+        self.df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
         outstream.seek(0)
 
         # Upload contents
@@ -163,6 +95,103 @@ class TableInterface:
 
         print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print("-----------------------------------------------------")
+
+    def _fetchAndConvertProviderData(self):
+        # provider connection and snapshots
+        print(f"Fetching {self.provider} {self.table} files...")
+        apiconn = providerAPI(self.provider)
+
+        # Loop through if multiple call
+        if self.table_cfg.get("iter",False):
+            count = 0
+            for iter_value in self.table_cfg['iterValues']:
+                # Track file number
+                count+=1
+                print(f"{count} of {len(self.table_cfg['iterValues'])}: {iter_value}")
+                # Data/body of request
+                data = self.table_cfg.get("restOfBody",{})
+                data[self.table_cfg['iterVarName']] = iter_value
+                # Send post request, return file_ if successful
+                file_ = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
+                self._convertFileStringAppendToDF(file_)
+        else:
+            if self.table_cfg.get("requiresBody",True):
+                data = self.table_cfg['body']
+            else:
+                data=None
+            snapshot = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
+            self._convertFileStringAppendToDF(file_)
+
+    def _convertFileStringAppendToDF(self, file_):
+        # process file if values
+        if len(file_) > 0:
+            instream = StringIO(file_)
+            df = (pd.read_csv(instream,
+                                sep = self.provider_cfg.get("sep",','), 
+                                dtype = str,
+                                na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
+                    .replace('[\\t\\r\\n<>&\+]','',regex=True) 
+                    .replace('[(^\")(\"$)]','',regex=True) 
+                )
+
+            # Append to existing df
+            self.df = self.df.append(df, sort = False)
+
+    def _processProviderData(self): 
+        """ Function to process certain columns in download
+        """
+
+        # concatenate columns with + in them
+        to_concat = self.map_df[self.provider].str.contains("+",regex=False)
+        for index in self.map_df[to_concat].index:
+            concat_col_name = self.map_df.loc[index, self.provider]
+            self.df[concat_col_name] = ""
+            concat_cols = self.map_df.loc[index, self.provider].split("+")
+            for col in concat_cols:
+                self.df[concat_col_name] = (
+                    self.df[concat_col_name]
+                        .str.cat(self.df[col], sep = " ")
+                        .str.lstrip()
+                ) 
+
+        # concatenate columns with | in them
+        to_concat = self.map_df[self.provider].str.contains("|",regex=False)
+        for index in self.map_df[to_concat].index:
+            concat_col_name = self.map_df.loc[index, self.provider]
+            self.df[concat_col_name] = ""
+            concat_cols = self.map_df.loc[index, self.provider].split("|")
+            for col in concat_cols:
+                self.df[concat_col_name] = (
+                    self.df[concat_col_name]
+                        .str.cat(self.df[col], sep = "")
+                        .str.lstrip()
+                ) 
+
+        # get the mapped columns that are actually in the df
+        mapped_cols_in_df = [x for x in self.map_df[self.provider].values.tolist() if x in self.df.columns]
+        # filter table for cols that are mapped
+        self.df = self.df[mapped_cols_in_df]
+        # get the target colnames that exist
+        renamed_cols_in_df = self.map_df.loc[self.map_df[self.provider].isin(mapped_cols_in_df), self.org].values.tolist()
+        # rename for re entry to DB 
+        self.df.columns = renamed_cols_in_df
+        # drop any blank rows
+        self.df = self.df.dropna(axis = 1, how = 'all')
+
+        # Process location from lat long to long lat (for PostGIS)
+        geo_cols = (self.map_df
+                    .loc[self.map_df['type']=='GEOGRAPHY',self.org]
+        )
+        for col in geo_cols:
+            self.df[col] = self.df[col].replace("- -",np.NaN)
+            self.df[col] = self.df[col].apply(
+                lambda x: " ".join(x.split(',')[::-1]) if x is not np.NaN else x
+            )
+
+        # add new fields
+        self.df['external_sys'] = self.provider
+        self.df['organization'] = self.provider_cfg['organization']
+        self.df['country'] = self.provider_cfg['country']
 
     def _createSelect(self, row):
         dtype = row['type']
