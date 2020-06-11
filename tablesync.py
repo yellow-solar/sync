@@ -115,7 +115,7 @@ class TableInterface:
                 file_ = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
                 self._convertFileStringAppendToDF(file_)
         else:
-            if self.table_cfg.get("requiresBody",True):
+            if self.table_cfg.get("requiresBody",False):
                 data = self.table_cfg['body']
             else:
                 data=None
