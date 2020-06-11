@@ -235,7 +235,7 @@ webusers,webuser_email,TEXT,email,email,email,1,1,1
 webusers,webuser_username,TEXT,username,username,username,,1,
 webusers,webuser_role,TEXT,role,role,role,,1,
 account_events,event_id,INT,,,,,1,1
-account_events,event_external_id,TEXT,,_id,,1,,
+account_events,event_external_id,TEXT,,_id,,1,1,
 account_events,event_type,TEXT,,type,,,1,
 account_events,account_external_id,TEXT,,contract.contractNumber,,,1,
 account_events,unit_number,TEXT,,contract.paygNumber,,,1,
@@ -245,7 +245,7 @@ account_events,event_additional_info,TEXT,,additionalInfo,,,1,
 account_events,event_user_upya_id,TEXT,,,,,1,
 account_events,event_user_id,INT,,,,,1,
 stock_events,event_id,INT,,,,,1,1
-stock_events,event_external_id,TEXT,,_id,,1,,
+stock_events,event_external_id,TEXT,,_id,,1,1,
 stock_events,event_type,TEXT,,type,,,1,
 stock_events,product,TEXT,,asset.productDetails.name,,,1,
 stock_events,stock_id,INT,,,,,1,
