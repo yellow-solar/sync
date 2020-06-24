@@ -244,6 +244,7 @@ account_events,event_info,TEXT,,info,,,1,
 account_events,event_additional_info,TEXT,,additionalInfo,,,1,
 account_events,event_user_upya_id,TEXT,,,,,1,
 account_events,event_user_id,INT,,,,,1,
+account_events,replaced_unit_number,TEXT,,,,,1,
 stock_events,event_id,INT,,,,,1,1
 stock_events,event_external_id,TEXT,,_id,,1,1,
 stock_events,event_type,TEXT,,type,,,1,
