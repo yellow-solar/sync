@@ -263,8 +263,7 @@ where a.registering_user_external_id = b.user_angaza_id
 update core.accounts a
 set registering_user = b.full_name
 from core.users b
-where a.registering_user is null and
-	(a.registering_user_external_id = b.user_angaza_id
+where (a.registering_user_external_id = b.user_angaza_id
 	or a.registering_user_external_id = b.user_upya_id)
 ;
 
@@ -280,11 +279,18 @@ where a.responsible_user_external_id = b.user_angaza_id
 update core.accounts a
 set responsible_user = b.full_name
 from core.users b
-where a.responsible_user is null and
-	(a.responsible_user_external_id = b.user_angaza_id
+where (a.responsible_user_external_id = b.user_angaza_id
 	or a.responsible_user_external_id = b.user_upya_id)
 ;
 
+
+--- ACCOUNT EVENTS ---
+update core.account_events 
+set replaced_unit_number = substring(event_info from '[0-9]{8}')
+where event_type = 'REPLACED'
+	and replaced_unit_number is null
+	and zoho_id is null
+;
 
 ---- STOCK -----
 -- Account ID
