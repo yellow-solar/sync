@@ -87,7 +87,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
                 # send an email notifying failure
                 gmail.quick_send(
                     to = 'devops@yellow.africa',
-                    subject = f"Zoho sync error",
+                    subject = f"Zoho sync error: {form} slice {j}",
                     text = f"See AWS log for details <br><br>{e}",
                 )  
 
