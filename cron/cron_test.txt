@@ -1,0 +1,2 @@
+# Backup specific zoho tables - midnight every day
+0 0 * * * cd yellow && ~/.venv/data-jobs/bin/python -m yellowsync.ofeefeebackup        >> ../.log/ofeefeebackup.log 2>&1
