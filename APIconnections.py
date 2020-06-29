@@ -259,16 +259,15 @@ class ZohoAPI:
                         print("Failed with status: " + status.text)
                         gmail.quick_send(
                             to = 'devops@yellow.africa',
-                            subject = f"Zoho sync event entry failed",
-                            text = f"An entry was not successful in rpc response from Zoho. See AWS log for details <br>",
+                            subject = f"Zoho sync: single entry failed",
+                            text = f"Row entry was not successful in rpc response from Zoho, with error {status.text}. See AWS log",
                         )
-                        raise Exception("An entry was not successful in rpc response from Zoho")
 
             else:
                 gmail.quick_send(
                     to = 'devops@yellow.africa',
-                    subject = f"Zoho sync event entry failed",
-                    text = f"Received errorlist in rpc response from Zoho. See AWS log for details <br>",
+                    subject = f"Zoho sync SLICE FAILED",
+                    text = f"Received errorlist in rpc response from Zoho. Request text: {rpc_request.text}",
                 )
                 raise Exception("Received errorlist in rpc response from Zoho")
 
@@ -277,10 +276,10 @@ class ZohoAPI:
             print(f"Error {rpc_request.status_code}: see rpc request text for more detail")
             gmail.quick_send(
                 to = 'devops@yellow.africa',
-                subject = f"Zoho sync event entry failed",
-                text = f"Upload Request failed. See AWS log for details <br>",
+                subject = f"Zoho sync CALL FAILED ERROR: {rpc_request.status_code}",
+                text = f"Upload Request failed: {rpc_request.text}",
             )
-            raise ValueError(f"Request failed with error code {rpc_request.status_code}")
+            raise ValueError(f"Request failed with error code {rpc_request.text}")
         
         # If all is good, then process the IDs for return
         return(rpc_request.text)
