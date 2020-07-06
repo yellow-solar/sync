@@ -260,7 +260,7 @@ class ZohoAPI:
                         gmail.quick_send(
                             to = 'devops@yellow.africa',
                             subject = f"Zoho sync: single entry failed",
-                            text = f"Row entry was not successful in rpc response from Zoho, with error {status.text}. See AWS log",
+                            text = f"Row entry was not successful in rpc response from Zoho, with error {status.text}. {rpc_request.text}",
                         )
 
             else:
