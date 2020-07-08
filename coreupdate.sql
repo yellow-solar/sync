@@ -47,6 +47,13 @@ where external_sys = 'upya_uganda'
 	and account_external_id is null
 ;
 
+-- application status is approved if already approved
+update core.applications 
+set status = 'APPROVED'
+where account_external_id is not null
+and status = 'APPROVAL_PENDING'
+;
+
 -- MAP THE STOCK STATUSES 
 -- transit_state
 update core.stock a
