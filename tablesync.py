@@ -130,7 +130,7 @@ class TableInterface:
                                 sep = self.provider_cfg.get("sep",','), 
                                 dtype = str,
                                 na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
-                    .replace('[\\t\\r\\n<>&\+]','',regex=True) 
+                    .replace('[\\t\\r\\n<>&]','',regex=True) 
                     .replace('[(^\")(\"$)]','',regex=True) 
                 )
 
