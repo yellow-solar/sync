@@ -131,7 +131,7 @@ class TableInterface:
                                 dtype = str,
                                 na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                     .replace('[\\t\\r\\n<>&]','',regex=True) 
-                    .replace('[(^\")(\"$)]','',regex=True) 
+                    # .replace('[(^\")(\"$)]','',regex=True) 
                 )
 
             # Append to existing df
@@ -344,7 +344,7 @@ class TableInterface:
         self.internalSync()
 
 if __name__ == "__main__":
-    sync = TableInterface('angaza','payments')
+    sync = TableInterface('upya','payments')
     print(sync.fetchCoreTableSQL(update=True))
     # sync.fetchAndUploadProviderData()
     # sync.internalSync()
