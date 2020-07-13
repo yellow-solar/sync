@@ -26,7 +26,7 @@ providers = config(section='providers')
 core_tables = config(section='solarcore')
 
 # TABLES = ['payments','accounts','stock','clients','users','webusers']
-TABLES = ['clients']
+TABLES = ['applications']
 
 ## Update the Yellow DB tables
 for provider in providers:
@@ -44,7 +44,7 @@ for provider in providers:
             print(e)
             print('-------------------------------------------------')
             # print traceback
-            traceback.print_exc()
+            # traceback.print_exc()
             # send an email notifying failure
             gmail.quick_send(
                 to = 'devops@yellow.africa',
