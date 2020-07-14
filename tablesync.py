@@ -7,7 +7,7 @@ import json
 # Third party libraries
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from psycopg2.extensions import AsIs
 import csv
 
@@ -108,9 +108,19 @@ class TableInterface:
                 # Track file number
                 count+=1
                 print(f"{count} of {len(self.table_cfg['iterValues'])}: {iter_value}")
+                
                 # Data/body of request
                 data = self.table_cfg.get("restOfBody",{})
                 data[self.table_cfg['iterVarName']] = iter_value
+                
+                # Range inputs 
+                if self.table_cfg.get("range",None) is not None:
+                    if self.table_cfg.get("rangeType") == "subdays" and '%fromdate' in data.values():
+                        from_date = datetime.now() - timedelta(days=self.table_cfg.get("range"))
+                        from_date_str = from_date.strftime("%Y-%m-%d")
+                        from_date_key = {y:x for (x,y) in data.items()}['%fromdate']
+                        data[from_date_key] = from_date_str
+                
                 # Send post request, return file_ if successful
                 file_ = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
                 self._convertFileStringAppendToDF(file_)
