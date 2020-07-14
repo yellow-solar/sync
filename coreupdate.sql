@@ -141,6 +141,7 @@ set next_of_kin_contact_number = left(nullif(coalesce(regexp_replace(next_of_kin
 update core.clients a
 set client_latitude = ST_X(client_location_lnglat::geometry)
  , client_longitude = ST_Y(client_location_lnglat::geometry) 
+ where client_latitude is null or client_longitude is null
 ;
 
 -----------------------  FOREIGN KEYS -------------------------- 
