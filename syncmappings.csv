@@ -213,7 +213,7 @@ applications,marketing_consent,TEXT,customer_consents_to_being_contacted_regardi
 clients,client_id,INT,,,,,1,1
 clients,client_external_id,TEXT,angaza_id,clientNumber,clientNumber,1,1,
 clients,client_name,TEXT,client_name,profile.firstName+profile.lastName,profile.firstName+profile.lastName,,1,
-clients,client_phone_number,BIGINT,phone_number,contact.fullNumber,contact.fullNumber,,1,
+clients,client_phone_number,BIGINT,phone_number,contact.countryCode|contact.mobile,contact.countryCode|contact.mobile,,1,
 clients,unit_numbers,TEXT,account_numbers,contracts,contracts,,1,
 clients,date_created_utc,TIMESTAMPTZ,date_created_utc,entryDate,entryDate,,1,
 clients,client_photo,TEXT,client_photo,picture,picture,,1,
