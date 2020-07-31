@@ -322,11 +322,17 @@ class TableInterface:
     def corePrepSQL(self):
         if self.table_cfg.get('core_prep',False):
             print("Running core updates before internal sync")
-            self.execute(open("coreprep.sql", "r").read())
+            self.execute(open("sql/coreprep.sql", "r").read())
         elif self.table_cfg.get('users_prep',False):
             print("Running users updates before internal sync")
-            self.execute(open("usersprep.sql", "r").read())
-                
+            self.execute(open("sql/usersprep.sql", "r").read())
+
+    def coreUpdateSQL(self):
+        if self.table_cfg.get('coreUpdateBool',False):
+            print("Running core updates after internal sync")
+            file_ = "sql/" + self.table_cfg['coreUpdateSQL']
+            print(f"{file_}...")
+            self.execute(open(file_, "r").read())
 
     def _getStagingColNames(self):
         curs = self.db_conn.cursor()
@@ -352,6 +358,7 @@ class TableInterface:
         self.fetchAndUploadProviderData()
         self.corePrepSQL()
         self.internalSync()
+        self.coreUpdateSQL()
 
 if __name__ == "__main__":
     sync = TableInterface('upya','payments')
