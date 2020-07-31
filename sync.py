@@ -54,7 +54,7 @@ if len(sys.argv) > 1:
             PROVIDERS = [sys.argv[2]]
     
     # if too many arguments return an error
-    elif len(sys.argv) > 3:
+    elif (len(sys.argv) > 3):
         raise ValueError(f"Too many arguments. Expected 2, received {len(sys.argv)-1}")
         
 ## FOR MANUAL RUNS USE THESE REPLACEMENTS
