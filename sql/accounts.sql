@@ -170,7 +170,7 @@ where a.country = b.country_name
 ---------------------------------------
 
 -- Replacements table made from upya data
-insert into core.replacements (replacement_external_id, external_sys, product,account_id,old_stock_id,old_unit_number,old_asset_number,new_stock_id,new_unit_number,new_asset_number,
+/* insert into core.replacements (replacement_external_id, external_sys, product,account_id,old_stock_id,old_unit_number,old_asset_number,new_stock_id,new_unit_number,new_asset_number,
 							  replacement_date_utc,source_of_replacement,acc_responsible_user,acc_responsible_user_id,acc_responsible_user_ext_id)
 select 'R'||a.previous_unit_number as replacement_external_id
 	, a.external_sys
@@ -198,9 +198,9 @@ where a.date_of_replacement_utc is not null
 	and a.previous_unit_number is not null
 	and old_s.archived = false
 limit 100
-;
+; */
 
--- account id
+/* -- account id
 update core.replacements r
 set account_id = a.account_id
 from core.accounts a
@@ -244,4 +244,4 @@ set acc_responsible_user_id = u.user_id
 from core.users u
 where (r.acc_responsible_user_ext_id = u.user_upya_id or r.acc_responsible_user_ext_id = u.user_angaza_id)
 	and u.user_id is not null
-;
+; */
