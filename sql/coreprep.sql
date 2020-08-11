@@ -4,7 +4,13 @@ INSERT INTO core.products (product, product_external_name)
 	where product is not null
 		and product not in (select product from core.products)
 		;
-		
+
+INSERT INTO core.products (product, product_external_name)
+	select distinct product, product from upya.accounts
+	where product is not null
+		and product not in (select product from core.products)
+		;
+
 INSERT INTO core.pricing_groups(
 	product, pricing_group)
 	select distinct product, pricing_group from upya.accounts
@@ -17,7 +23,13 @@ INSERT INTO core.products (product, product_external_name)
 	where product is not null
 		and product not in (select product from core.products)
 		;
-		
+
+INSERT INTO core.products (product, product_external_name)
+	select distinct product, product from upya.upya_uganda
+	where product is not null
+		and product not in (select product from core.products)
+		;
+
 INSERT INTO core.pricing_groups(
 	product, pricing_group)
 	select distinct product, pricing_group from upya_uganda.accounts
