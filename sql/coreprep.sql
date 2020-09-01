@@ -25,7 +25,7 @@ INSERT INTO core.products (product, product_external_name)
 		;
 
 INSERT INTO core.products (product, product_external_name)
-	select distinct product, product from upya.upya_uganda
+	select distinct product, product from upya_uganda.accounts
 	where product is not null
 		and product not in (select product from core.products)
 		;
