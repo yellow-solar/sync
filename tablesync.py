@@ -92,6 +92,7 @@ class TableInterface:
         cur = db_conn.cursor()
         cur.copy_from(outstream, f"{self.provider}.{self.table}") 
         db_conn.commit()
+        db_conn.close()
 
         print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print("-----------------------------------------------------")
@@ -346,9 +347,10 @@ class TableInterface:
 
     def execute(self, sql):
         self.connect()
-        cursor = self.db_conn.cursor()
-        cursor.execute(sql)
-        self.db_conn.commit()
+        with self.db_conn as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            conn.commit()
         return(cursor)
 
     def close(self):

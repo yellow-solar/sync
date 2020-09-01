@@ -27,12 +27,16 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
     update_on = 'ID' if update else None
     insert_or_update = "Updated" if update else "Inserted"
 
-    # Buil sql and cursor
+    # Build sql and cursor
     sql = tablesync.fetchCoreTableSQL(update=update)
-    cur = tablesync.db_conn.cursor()
-    cur.execute(sql)
-    # Get results
-    records = cur.fetchall()
+    
+     # Get results
+    with tablesync.db_conn as conn:
+        cur = conn.cursor()
+        cur.execute(sql)
+        records = cur.fetchall()
+   
+    # Create columns
     colnames = [desc[0] if desc[0]!="zoho_id" else "ID" for desc in cur.description]
     
     # List of dicts which are zipped with field name
@@ -113,6 +117,9 @@ def zohoSync(zoho_table, zoho):
     # Update the old records to Zoho - update first because inserts don't need to be
     if zohosync_cfg.get("update",True):
         insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
+
+    print("-----------------------------------------------------")
+    print("Completed:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
    
 
