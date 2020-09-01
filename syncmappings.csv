@@ -1,4 +1,4 @@
-﻿table,yellow,type,angaza,upya,upya_uganda,update_on,zoho,pk
+table,yellow,type,angaza,upya,upya_uganda,update_on,zoho,pk
 all,external_sys,TEXT,external_sys,external_sys,external_sys,,1,
 all,organization,TEXT,organization,organization,organization,,1,
 all,country,TEXT,country,country,country,,1,
@@ -225,7 +225,7 @@ clients,recorder,TEXT,recorder,recorder,recorder,,1,
 clients,client_latitude,DECIMAL,,,,,1,
 clients,client_longitude,DECIMAL,,,,,1,
 clients,secondary_phone_number,BIGINT,,contact.secondaryMobile,contact.secondaryMobile,,1,
-clients,responsible_user_external_id,TEXT,,agentReference,agentReference,,1,
+clients,responsible_user_external_id,TEXT,,agent.agentNumber,agent.agentNumber,,1,
 clients,responsible_user_id,INT,,,,,1,
 webusers,webuser_fullname,TEXT,first_name+last_name,profile.firstName+profile.lastName,profile.firstName+profile.lastName,,1,
 webusers,webuser_upya_id,TEXT,,userNumber,userNumber,,1,
