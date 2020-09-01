@@ -10,9 +10,17 @@ set client_latitude = ST_X(client_location_lnglat::geometry)
  , client_longitude = ST_Y(client_location_lnglat::geometry) 
  where client_latitude is null or client_longitude is null
 ;
+
+-- Responsible user
+update core.clients a
+set responsible_user_id = b.user_id
+from core.users b
+where a.responsible_user_external_id = b.user_angaza_id
+	or a.responsible_user_external_id = b.user_upya_id
+;
 -----------------------  FOREIGN KEYS -------------------------- 
 
-
+-- Country
 update core.clients a
 set country_id = b.country_id
 from core.country b
