@@ -34,10 +34,13 @@ gmail = Gmail('googleservice/mail-93851bb46b8d.json', 'system@yellow.africa')
 TABLES = []
 ZOHO_TABLES = zoho_cfg['sync_tables'].keys()
 PROVIDERS = providers_config.keys()
+TABLE_ARG = False
+
 
 # if more than one argument,# the first is table name
 if len(sys.argv) > 1:
     
+    # if 1 one argument
     if sys.argv[1] in core_tables.keys():
         TABLE_ARG = True
         TABLES = [sys.argv[1]]
@@ -58,8 +61,7 @@ if len(sys.argv) > 1:
         raise ValueError(f"Too many arguments. Expected 2, received {len(sys.argv)-1}")
         
 ## FOR MANUAL RUNS USE THESE REPLACEMENTS
-# TABLES = ['payments','accounts','stock','clients','users','webusers']
-# TABLES = ['applications']
+# TABLES = ['payments','accounts','stock','clients','users','webusers'
 
 # Update the Yellow DB tables
 for provider in PROVIDERS:
