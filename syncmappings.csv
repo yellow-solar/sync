@@ -1,4 +1,4 @@
-table,yellow,type,angaza,upya,upya_uganda,update_on,zoho,pk
+﻿table,yellow,type,angaza,upya,upya_uganda,update_on,zoho,pk
 all,external_sys,TEXT,external_sys,external_sys,external_sys,,1,
 all,organization,TEXT,organization,organization,organization,,1,
 all,country,TEXT,country,country,country,,1,
@@ -27,8 +27,8 @@ accounts,upfront_price,DECIMAL,upfront_price,pricingSchedule.upfrontPayment,pric
 accounts,upfront_days_included,DECIMAL,upfront_days_included,pricingSchedule.upfrontDays,pricingSchedule.upfrontDays,,1,
 accounts,unlock_price,DECIMAL,unlock_price,totalCost,totalCost,,1,
 accounts,minimum_payment_amount,DECIMAL,minimum_payment_amount,pricingSchedule.minPayment,pricingSchedule.minPayment,,1,
-accounts,days_per_recurring_amount,INT,,pricingSchedule.freq,pricingSchedule.freq,,,
-accounts,recurring_amount,DECIMAL,,pricingSchedule.recurrentPayment,pricingSchedule.recurrentPayment,,,
+accounts,days_per_recurring_amount,INT,,pricingSchedule.freq,pricingSchedule.freq,,1,
+accounts,recurring_amount,DECIMAL,,pricingSchedule.recurrentPayment,pricingSchedule.recurrentPayment,,1,
 accounts,expected_paid,DECIMAL,expected_paid,,,,1,
 accounts,total_paid,DECIMAL,total_paid,totalPaid,totalPaid,,1,
 accounts,outstanding_amount,DECIMAL,,remainingDebt,remainingDebt,,1,
