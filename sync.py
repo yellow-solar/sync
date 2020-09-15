@@ -18,7 +18,6 @@ from APIconnections import ZohoAPI
 from synczoho import zohoSync
 from googleapi.gmail import Gmail
 
-
 # YDB table config 
 providers_config = config(section='providers')
 core_tables = config(section='solarcore')
@@ -35,7 +34,6 @@ TABLES = []
 ZOHO_TABLES = zoho_cfg['sync_tables'].keys()
 PROVIDERS = providers_config.keys()
 TABLE_ARG = False
-
 
 # if more than one argument,# the first is table name
 if len(sys.argv) > 1:
@@ -102,7 +100,7 @@ if env == 'prod':
         zohoSync(zoho_table, zoho)
 
     # Run the upload sync checker to look for new values
-    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":"Upload_Sync_Checks"}) 
+    check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":f"upload:{zoho_table}"}) 
     if check.status_code==200:
         print("Upload sync checked")
     else: 
