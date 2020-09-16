@@ -279,10 +279,10 @@ class ZohoAPI:
                 subject = f"Zoho sync CALL FAILED ERROR: {rpc_request.status_code}",
                 text = f"Upload Request failed: {rpc_request.text}",
             )
-            raise ValueError(f"Request failed with error code {rpc_request.text}")
+            # raise ValueError(f"Request failed with error code {rpc_request.text}")
         
         # If all is good, then process the IDs for return
-        return(rpc_request.text)
+        return(rpc_request)
 
     def zohoToDF(self,report_request, form_link):
         if report_request.status_code == 200:

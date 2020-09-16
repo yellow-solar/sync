@@ -62,38 +62,42 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
         # Call zoho with XML
         response = zoho.rpcUploadChunk(dicts_slice, form, update_on = update_on)
         processed += len(dicts_slice)
-        print(f"Slice {j+1}: {insert_or_update} {processed} of {len(record_dicts)} records to Zoho")
 
-        # Insert IDs back to DB if not updating
-        if not update:
-            try:
-                # process response to get ids
-                print("Creating ID maps..")
-                ids = zoho.xmlFindIDs(response, tablesync.update_on)
-                # update DB with each ZOho ID 
-                # loop through ids and update YDB one at a time
-                print("Inserting IDs...")
-                counter = 0
-                for row in ids[['ID',tablesync.update_on]].itertuples(index=False, name=None):
-                    cur = tablesync.db_conn.cursor()
-                    update_sql = f""" update {tablesync.core}.{tablesync.table}
-                        set zoho_id = %s
-                        where {tablesync.update_on} = %s
-                    """
-                    cur.execute(update_sql, row)
-                    counter+=1
-                    # print(f"Inserted {counter} of {len(ids)}")
-                tablesync.db_conn.commit()
-                print(f"Inserted {len(ids)} IDs to YDB")
-            except Exception as e:
-                ### if it excepts then we need to delete the new inserts and IDs?
-                # raise Exception("Failed to process response")
-                # send an email notifying failure
-                gmail.quick_send(
-                    to = 'devops@yellow.africa',
-                    subject = f"Insert ID error: {form} slice {j}",
-                    text = f"See AWS log for details <br><br> {e} for the following: {ids}",
-                )  
+        # Check response
+        if response.status_code == 200:
+            print(f"Slice {j+1}: {insert_or_update} {processed} of {len(record_dicts)} records to Zoho")
+            # Insert IDs back to DB if not updating
+            if not update:
+                try:
+                    # process response to get ids
+                    print("Creating ID maps..")
+                    ids = zoho.xmlFindIDs(response.text, tablesync.update_on)
+                    # update DB with each ZOho ID 
+                    # loop through ids and update YDB one at a time
+                    print("Inserting IDs...")
+                    counter = 0
+                    for row in ids[['ID',tablesync.update_on]].itertuples(index=False, name=None):
+                        cur = tablesync.db_conn.cursor()
+                        update_sql = f""" update {tablesync.core}.{tablesync.table}
+                            set zoho_id = %s
+                            where {tablesync.update_on} = %s
+                        """
+                        cur.execute(update_sql, row)
+                        counter+=1
+                        # print(f"Inserted {counter} of {len(ids)}")
+                    tablesync.db_conn.commit()
+                    print(f"Inserted {len(ids)} IDs to YDB")
+                except Exception as e:
+                    ### if it excepts then we need to delete the new inserts and IDs?
+                    # raise Exception("Failed to process response")
+                    # send an email notifying failure
+                    gmail.quick_send(
+                        to = 'devops@yellow.africa',
+                        subject = f"Insert ID error: {form} slice {j}",
+                        text = f"See AWS log for details <br><br> {e} for the following: {ids}",
+                    )  
+        else:
+            print(f"Slice {j+1}: Failed with error code {reponse.status_code}")
 
 def zohoSync(zoho_table, zoho):
     # 0. Prep
