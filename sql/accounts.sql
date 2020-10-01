@@ -90,7 +90,9 @@ update core.accounts a
 set client_id = b.client_id
 from core.clients b
 where a.client_external_id = b.client_external_id
+	and a.client_id is null
 ;
+
 -- Stock ID
 -- input stock id if null
 update core.accounts a
@@ -98,6 +100,7 @@ set stock_id = b.stock_id
 from core.stock b
 where a.asset_number = b.asset_number
 	and a.external_sys = b.external_sys
+	and stock_id is null
 ;
 
 -- Unit Number
@@ -123,6 +126,7 @@ set application_id = b.application_id
 from core.applications b
 where a.account_external_id = b.account_external_id
 	and b.account_external_id is not null
+	and a.application_id is null
 ;
 
 -- Registering user ID
@@ -163,6 +167,7 @@ update core.accounts a
 set country_id = b.country_id
 from core.country b
 where a.country = b.country_name
+	and a.country_id is null
 ;
 
 
