@@ -100,7 +100,7 @@ set stock_id = b.stock_id
 from core.stock b
 where a.asset_number = b.asset_number
 	and a.external_sys = b.external_sys
-	and stock_id is null
+	and a.stock_id is null
 ;
 
 -- Unit Number
