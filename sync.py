@@ -34,6 +34,7 @@ TABLES = []
 ZOHO_TABLES = zoho_cfg['sync_tables'].keys()
 PROVIDERS = providers_config.keys()
 TABLE_ARG = False
+SET_INSERT_ONLY = False
 
 # if more than one argument,# the first is table name
 if len(sys.argv) > 1:
@@ -49,10 +50,16 @@ if len(sys.argv) > 1:
             ZOHO_TABLES = []
     
     # if 2 extra arguments,set providers
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         if sys.argv[2] in providers_config.keys():
             TABLE_ARG = True
             PROVIDERS = [sys.argv[2]]
+    
+        if (len(sys.argv) == 4):
+            if sys.argv[3] == 'True':
+                SET_INSERT_ONLY = True
+            else:
+                print("3rd argument not recognized, running both insert and update")
     
     # if too many arguments return an error
     elif (len(sys.argv) > 3):
@@ -97,7 +104,7 @@ if env == 'prod':
     for zoho_table in ZOHO_TABLES:
         print("--------------------------------------")
         print(f"Zoho Import Sync: {zoho_table}")
-        zohoSync(zoho_table, zoho)
+        zohoSync(zoho_table, zoho, set_insert_only=SET_INSERT_ONLY)
 
     # Run the upload sync checker to look for new values
     check = zoho.add("API_Triggers", payload = {"trigger_command":"execute","command_string":f"upload:{zoho_table}"}) 

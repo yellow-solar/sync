@@ -99,7 +99,7 @@ def insertOrUpdateZoho(tablesync, zoho, form, update, slice_length):
         else:
             print(f"Slice {j+1}: Failed with error code {reponse.status_code}")
 
-def zohoSync(zoho_table, zoho):
+def zohoSync(zoho_table, zoho, set_insert_only = False):
     # 0. Prep
     print("-----------------------------------------------------")
     print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -119,7 +119,7 @@ def zohoSync(zoho_table, zoho):
     insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=False, slice_length = slice_length)
 
     # Update the old records to Zoho - update first because inserts don't need to be
-    if zohosync_cfg.get("update",True):
+    if zohosync_cfg.get("update",True) and not set_insert_only:
         insertOrUpdateZoho(tablesync, zoho, form=zohosync_cfg['form'], update=True, slice_length = slice_length)
 
     print("-----------------------------------------------------")
