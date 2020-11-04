@@ -22,7 +22,7 @@
 25 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync stock_events          >> ../.log/stock-events-sync.log 2>&1
 
 # All statement import
-*/10 * * * * cd drivegrabber && ~/.venv/sync/bin/python main.py                  >> ../.log/statementsupload.log 2>&1
+# */10 * * * * cd drivegrabber && ~/.venv/sync/bin/python main.py                  >> ../.log/statementsupload.log 2>&1
 
 # Sheets sync
 0 */1 * * * cd yellow && ~/.venv/data-jobs/bin/python -m yellowsync.sheetsync            >> ../.log/sheetsync.log 2>&1
