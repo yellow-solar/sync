@@ -46,6 +46,7 @@ class TableInterface:
         self.connect()
         # Dataframe
         self.df = pd.DataFrame()
+        self.apifile = None
         # For provider data
         if self.provider is not None:
             self.provider_cfg = config(section = "providers")[provider]
@@ -66,36 +67,41 @@ class TableInterface:
            
         # Fetch Data
         self._fetchAndConvertProviderData()
-        self._processProviderData()
+        # Continue if data
+        if (len(self.apifile)>0): 
+            self._convertFileStringAppendToDF()
+            self._processProviderData()
 
-        # Re-create table header in case different
-        print("Re-creating table header...")
-        db_engine = self.db.get_engine()
-        self.df.head(0).to_sql(
-            self.table, 
-            db_engine,
-            schema = self.provider, 
-            if_exists='replace',
-            index=False
-            )
+            # Re-create table header in case different
+            print("Re-creating table header...")
+            db_engine = self.db.get_engine()
+            self.df.head(0).to_sql(
+                self.table, 
+                db_engine,
+                schema = self.provider, 
+                if_exists='replace',
+                index=False
+                )
 
-        # Create stringIO stream, and set cursore to start
-        outstream = StringIO()
-        # replace null and stream out
-        self.df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
-        outstream.seek(0)
+            # Create stringIO stream, and set cursore to start
+            outstream = StringIO()
+            # replace null and stream out
+            self.df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
+            outstream.seek(0)
 
-        # Upload contents
-        print("Uploading contents...")
-        db = yellowpgdb()
-        db_conn = db.connect()
-        cur = db_conn.cursor()
-        cur.copy_from(outstream, f"{self.provider}.{self.table}") 
-        db_conn.commit()
-        db_conn.close()
+            # Upload contents
+            print("Uploading contents...")
+            db = yellowpgdb()
+            db_conn = db.connect()
+            cur = db_conn.cursor()
+            cur.copy_from(outstream, f"{self.provider}.{self.table}") 
+            db_conn.commit()
+            db_conn.close()
 
-        print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print("-----------------------------------------------------")
+            print("Current Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            print("-----------------------------------------------------")
+        else:
+            print("No values in file")
 
     def _fetchAndConvertProviderData(self):
         # provider connection and snapshots
@@ -122,31 +128,28 @@ class TableInterface:
                         from_date_key = {y:x for (x,y) in data.items()}['%fromdate']
                         data[from_date_key] = from_date_str
                 
-                # Send post request, return file_ if successful
-                file_ = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
-                self._convertFileStringAppendToDF(file_)
+                # Send post request, return file if successful
+                self.apifile = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
         else:
             if self.table_cfg.get("requiresBody",False):
                 data = self.table_cfg['body']
             else:
                 data=None
-            file_ = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
-            self._convertFileStringAppendToDF(file_)
-
-    def _convertFileStringAppendToDF(self, file_):
+            self.apifile = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
+            
+    def _convertFileStringAppendToDF(self):
         # process file if values
-        if len(file_) > 0:
-            instream = StringIO(file_)
-            df = (pd.read_csv(instream,
-                                sep = self.provider_cfg.get("sep",','), 
-                                dtype = str,
-                                na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
-                    .replace('[\\t\\r\\n<>&]','',regex=True) 
-                    # .replace('[(^\")(\"$)]','',regex=True) 
-                )
+        instream = StringIO(self.apifile)
+        df = (pd.read_csv(instream,
+                            sep = self.provider_cfg.get("sep",','), 
+                            dtype = str,
+                            na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
+                .replace('[\\t\\r\\n<>&]','',regex=True) 
+                # .replace('[(^\")(\"$)]','',regex=True) 
+            )
 
-            # Append to existing df
-            self.df = self.df.append(df, sort = False)
+        # Append to existing df
+        self.df = self.df.append(df, sort = False)
 
     def _processProviderData(self): 
         """ Function to process certain columns in download
