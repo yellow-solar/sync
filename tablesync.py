@@ -137,7 +137,8 @@ class TableInterface:
             else:
                 data=None
             self.apifile = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
-            self._convertFileStringAppendToDF()
+            if (len(self.apifile) >0):
+                    self._convertFileStringAppendToDF()
             
     def _convertFileStringAppendToDF(self):
         # process file if values
