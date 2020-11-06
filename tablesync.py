@@ -69,7 +69,6 @@ class TableInterface:
         self._fetchAndConvertProviderData()
         # Continue if data
         if (len(self.apifile)>0): 
-            self._convertFileStringAppendToDF()
             self._processProviderData()
 
             # Re-create table header in case different
@@ -130,12 +129,15 @@ class TableInterface:
                 
                 # Send post request, return file if successful
                 self.apifile = apiconn.pullSnapshot(self.table_cfg['url'], get=False, post=True,data=data)
+                if (len(self.apifile) >0):
+                    self._convertFileStringAppendToDF()
         else:
             if self.table_cfg.get("requiresBody",False):
                 data = self.table_cfg['body']
             else:
                 data=None
             self.apifile = apiconn.pullSnapshot(self.table_cfg['url'], data=data)
+            self._convertFileStringAppendToDF()
             
     def _convertFileStringAppendToDF(self):
         # process file if values
@@ -145,7 +147,6 @@ class TableInterface:
                             dtype = str,
                             na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&]','',regex=True) 
-                # .replace('[(^\")(\"$)]','',regex=True) 
             )
 
         # Append to existing df

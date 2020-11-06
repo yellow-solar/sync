@@ -66,7 +66,10 @@ if len(sys.argv) > 1:
         raise ValueError(f"Too many arguments. Expected 2, received {len(sys.argv)-1}")
         
 ## FOR MANUAL RUNS USE THESE REPLACEMENTS
-# TABLES = ['payments','accounts','stock','clients','users','webusers'
+# TABLES = ['stock_events']
+# TABLE_ARG = True
+# ZOHO_TABLES = TABLES
+# PROVIDERS = ['upya']
 
 # Update the Yellow DB tables
 for provider in PROVIDERS:
