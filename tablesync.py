@@ -68,7 +68,7 @@ class TableInterface:
         # Fetch Data
         self._fetchAndConvertProviderData()
         # Continue if data
-        if (len(self.apifile)>0): 
+        if (len(self.df)>0): 
             self._processProviderData()
 
             # Re-create table header in case different
