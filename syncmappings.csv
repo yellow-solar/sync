@@ -178,7 +178,6 @@ applications,home_village,TEXT,,home_village,home_village,,1,
 applications,village_headman_name,TEXT,village_headman_name,village_headman_name,,,1,
 applications,village_headman_phone_number,BIGINT,,village_headman_phone_number,,,1,
 applications,group_village_headman_name,TEXT,group_village_headman_name,group_village_headman_name,,,1,
-applications,location_lnglat,GEOGRAPHY,location_latitudelongitude,client.profile.gps.latitude+client.profile.gps.longitude,client.profile.gps.latitude+client.profile.gps.longitude,,1,
 applications,marketing_consent,TEXT,customer_consents_to_being_contacted_regarding_application_and_future_offers,marketing_consent,marketing_consent,,1,
 clients,client_id,INT,,,,,1,1
 clients,client_external_id,TEXT,angaza_id,clientNumber,clientNumber,1,1,
