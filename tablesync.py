@@ -85,6 +85,7 @@ class TableInterface:
             # Create stringIO stream, and set cursore to start
             outstream = StringIO()
             # replace null and stream out
+            self.df = self.df.replace('undefined','')
             self.df.replace(np.nan,'\\N').to_csv(outstream, sep='\t', header=False, index=False, quoting = csv.QUOTE_NONE)
             outstream.seek(0)
 
@@ -148,6 +149,7 @@ class TableInterface:
                             dtype = str,
                             na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&]','',regex=True) 
+                .replace('undefined','',regex=True) 
             )
 
         # Append to existing df
