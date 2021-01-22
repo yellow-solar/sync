@@ -12,9 +12,9 @@
 # 45 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync accounts               >> ../.log/accounts-sync.log 2>&1
 # */20 6,7,8,9,10,11,12,13,14,15,16,17 * * *   cd sync && ~/.venv/sync/bin/python -m sync accounts upya True               >> ../.log/accounts-sync.log 2>&1
 
-15 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync account_events        >> ../.log/account-events-sync.log 2>&1
+# 15 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync account_events        >> ../.log/account-events-sync.log 2>&1
 
-25 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync stock_events          >> ../.log/stock-events-sync.log 2>&1
+# 25 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync stock_events          >> ../.log/stock-events-sync.log 2>&1
 
 # All statement import
 */10 * * * * cd drivegrabber && ~/.venv/sync/bin/python main.py                  >> ../.log/statementsupload.log 2>&1
