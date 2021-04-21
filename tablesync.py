@@ -145,7 +145,6 @@ class TableInterface:
         # process file if values
         instream = StringIO(self.apifile)
         df = (pd.read_csv(instream,
-                            sep = self.provider_cfg.get("sep",','), 
                             dtype = str,
                             na_values=['n/a','None','none','NONE',"",'n/a;n/a'])
                 .replace('[\\t\\r\\n<>&]','',regex=True) 
