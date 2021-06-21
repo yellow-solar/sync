@@ -1,7 +1,7 @@
 #Zoho upload jobs - all day
-32 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync users                 >> ../.log/users-sync.log 2>&1
+# 32 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync users                 >> ../.log/users-sync.log 2>&1
 
-32 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync webusers              >> ../.log/webusers-sync.log 2>&1
+# 32 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync webusers              >> ../.log/webusers-sync.log 2>&1
 
 # */10 */1 * * *   cd sync && ~/.venv/sync/bin/python -m sync applications        >> ../.log/applications-sync.log 2>&1
 
@@ -20,4 +20,4 @@
 */10 * * * * cd drivegrabber && ~/.venv/sync/bin/python main.py                  >> ../.log/statementsupload.log 2>&1
 
 # Sheets sync
-0 */1 * * * cd yellow && ~/.venv/data-jobs/bin/python -m yellowsync.sheetsync            >> ../.log/sheetsync.log 2>&1
+# 0 */1 * * * cd yellow && ~/.venv/data-jobs/bin/python -m yellowsync.sheetsync            >> ../.log/sheetsync.log 2>&1
